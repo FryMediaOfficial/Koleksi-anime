@@ -22,25 +22,6 @@
             overflow-x: hidden; scroll-behavior: smooth;
         }
 
-        /* --- CURSOR ANIMATION (BALIK LAGI JIR 🗿🔥) --- */
-        * { cursor: none !important; }
-        #cursor-dot {
-            width: 8px; height: 8px; background: var(--pink-neon); 
-            position: fixed; border-radius: 50%; pointer-events: none;
-            z-index: 10000; transform: translate(-50%, -50%); left: -100px; top: -100px;
-        }
-        #cursor-outline {
-            width: 30px; height: 30px; border: 2px solid var(--pink-neon); 
-            position: fixed; border-radius: 50%; pointer-events: none;
-            z-index: 9999; transform: translate(-50%, -50%); left: -100px; top: -100px;
-            transition: width 0.2s, height 0.2s, background 0.2s;
-            display: flex; align-items: center; justify-content: center; font-size: 10px;
-        }
-        .cursor-hover-active {
-            width: 50px !important; height: 50px !important;
-            background: rgba(255, 0, 85, 0.15) !important;
-        }
-
         #particles-js { position: fixed; width: 100%; height: 100%; top: 0; left: 0; z-index: -1; }
 
         header { 
@@ -72,7 +53,7 @@
         .gallery {
             display: grid; 
             grid-template-columns: repeat(2, 1fr); 
-            gap: 15px; max-width: 1100px; margin: 0 auto 80px; padding: 15px;
+            gap: 12px; max-width: 1100px; margin: 0 auto 80px; padding: 12px;
         }
         
         @media (min-width: 768px) { .gallery { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); } }
@@ -80,19 +61,14 @@
         .gallery-item {
             background: var(--card-bg); padding: 10px; border-radius: 15px;
             border: 1px solid var(--border); transition: 0.3s; position: relative;
-            text-align: left;
+            text-align: left; display: flex; flex-direction: column;
         }
-        .gallery-item img { width: 100%; height: 220px; object-fit: cover; border-radius: 10px; }
-        .gallery-item h3 { font-size: 0.85rem; margin: 10px 0 5px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: white; }
-        .gallery-item.hide { display: none; }
-
-        .rating-badge {
-            position: absolute; top: 15px; right: 15px; background: rgba(0,0,0,0.8);
-            padding: 3px 8px; border-radius: 8px; border: 1px solid var(--pink-neon); font-size: 0.7rem;
-            color: var(--pink-neon); font-weight: bold;
+        .gallery-item h3 { 
+            font-size: 0.8rem; margin: 8px 0 4px 0; color: white;
+            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
         }
 
-        .status-label { color: var(--pink-neon); font-size: 0.65rem; text-transform: uppercase; font-weight: bold; letter-spacing: 1px; }
+        .status-info { color: var(--pink-neon); font-size: 0.65rem; font-weight: bold; letter-spacing: 0.5px; }
 
         .floating-contact { position: fixed; bottom: 20px; right: 20px; z-index: 100; }
         .float-btn { width: 45px; height: 45px; border-radius: 50%; background: var(--pink-neon); color: white; border: none; font-size: 18px; box-shadow: 0 0 10px var(--pink-glow); }
@@ -102,8 +78,6 @@
 </head>
 <body>
 
-    <div id="cursor-dot"></div>
-    <div id="cursor-outline"></div>
     <div id="particles-js"></div>
 
     <div class="floating-contact">
@@ -123,7 +97,7 @@
 
     <div class="filter-buttons">
         <button class="filter-btn active" onclick="filterGallery('all')">SEMUA</button>
-        <button class="filter-btn" onclick="filterGallery('watching')">WATCHING</button>
+        <button class="filter-btn" onclick="filterGallery('watching')">PROSES</button>
         <button class="filter-btn" onclick="filterGallery('completed')">TAMAT</button>
     </div>
     
@@ -136,67 +110,44 @@
     particlesJS("particles-js", {"particles": {"number": {"value": 40}, "color": {"value": "#ff0055"}, "size": {"value": 1}, "move": {"enable": true, "speed": 1}}});
 
     const myAnimes = [
-        {
-            title: "Otonari no Tenshi-sama",
-            status: "completed",
-            image: "https://myanimelist.net/images/anime/1989/154843.jpg",
-            rating: "10/10"
-        },
-        {
-            title: "One Piece",
-            status: "watching",
-            image: "https://cdn.myanimelist.net/images/anime/1244/138851.jpg",
-            rating: "9.5/10"
-        },
-        {
-            title: "Solo Leveling",
-            status: "completed",
-            image: "https://cdn.myanimelist.net/images/anime/1258/126920.jpg",
-            rating: "8.5/10"
-        }
+        { title: "Tonikaku Kawaii", info: "[S1✅ | S2✅ | OVA✅] ❓", status: "completed" },
+        { title: "Spy X Family", info: "[S1✅ | S2✅ | S3📥] ❓", status: "watching" },
+        { title: "Horimiya", info: "[S1✅ | S2📥] ❓", status: "watching" },
+        { title: "Tsuki Ga Kirei", info: "📥", status: "watching" },
+        { title: "Chuunibyou Demo Koi Ga Shitai", info: "[S1⏳ | S2📥] 🔚", status: "watching" },
+        { title: "Shiro Seijo To Kuro Bokushi", info: "[S1✅] ❓", status: "completed" },
+        { title: "Giji Harem", info: "✅ 🔚", status: "completed" },
+        { title: "Tokidoki Bosotto Russia De Dereru Tonari No Alya San", info: "[S1✅ | S2📢]", status: "completed" },
+        { title: "The Angel Next Door Spoils Me Rotten", info: "[S1✅(rewatch 40x) | S2⏳]", status: "completed" },
+        { title: "The Girl I Like Forgot Her Glasses", info: "✅ ❓", status: "completed" },
+        { title: "Gimai Seikatsu", info: "✅❓", status: "completed" },
+        { title: "Kaoru Hana wa Rin to Saku", info: "✅❓", status: "completed" },
+        { title: "Taisho Otome Otogibanashi", info: "✅❓", status: "completed" },
+        { title: "Mamahaha no tsurego ga motokano datta", info: "✅❓", status: "completed" },
+        { title: "Kubo-san wa mob wo yurusanai", info: "✅❓", status: "completed" },
+        { title: "Kimi wa houkage insomnia", info: "✅❓", status: "completed" },
+        { title: "Bokiyou na senpai", info: "⏳", status: "watching" },
+        { title: "Yuru camp", info: "[S1⏳ | S2📥 | S3📥 | S4❓]", status: "watching" },
+        { title: "Seihantai na Kimi to Boku", info: "[S1✅ | S2📢]", status: "completed" },
+        { title: "Kimi ni todake", info: "⏳", status: "watching" }
     ];
 
     function renderAnime() {
         document.getElementById('anime-list').innerHTML = myAnimes.map(anime => `
             <div class="gallery-item ${anime.status}">
-                <div class="rating-badge">⭐ ${anime.rating.split('/')[0]}</div>
-                <img src="${anime.image}">
                 <h3>${anime.title}</h3>
-                <span class="status-label">${anime.status}</span>
+                <span class="status-info">${anime.info}</span>
             </div>
         `).join('');
     }
-
-    // --- LOGIKA CURSOR BALIK LAGI ---
-    const dot = document.getElementById("cursor-dot");
-    const outline = document.getElementById("cursor-outline");
-    let mouseX = -100, mouseY = -100, outlineX = -100, outlineY = -100;
-
-    window.addEventListener("mousemove", e => {
-        mouseX = e.clientX; mouseY = e.clientY;
-        dot.style.left = mouseX + "px"; dot.style.top = mouseY + "px";
-    });
-
-    function animateCursor() { 
-        outlineX += (mouseX - outlineX) * 0.15; outlineY += (mouseY - outlineY) * 0.15; 
-        outline.style.left = outlineX + "px"; outline.style.top = outlineY + "px"; 
-        requestAnimationFrame(animateCursor); 
-    }
-    animateCursor();
-
-    // Hover effect biar outline cursor-nya membesar
-    document.addEventListener("mouseover", e => { 
-        if (e.target.closest('button, .gallery-item')) outline.classList.add("cursor-hover-active"); 
-    });
-    document.addEventListener("mouseout", e => { 
-        if (e.target.closest('button, .gallery-item')) outline.classList.remove("cursor-hover-active"); 
-    });
 
     function filterGallery(category) {
         const buttons = document.querySelectorAll('.filter-btn');
         buttons.forEach(btn => btn.classList.remove('active'));
         event.target.classList.add('active');
-        document.querySelectorAll('.gallery-item').forEach(item => { (category === 'all' || item.classList.contains(category)) ? item.classList.remove('hide') : item.classList.add('hide'); });
+        document.querySelectorAll('.gallery-item').forEach(item => { 
+            (category === 'all' || item.classList.contains(category)) ? item.classList.remove('hide') : item.classList.add('hide'); 
+        });
     }
 
     window.onload = () => { renderAnime(); setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString('id-ID'); }, 1000); };
