@@ -38,15 +38,16 @@
         }
 
         .main-container {
-            max-width: 900px; margin: 25px auto; padding: 20px; 
+            max-width: 900px; margin: 25px auto; padding: 15px; 
             background: rgba(255, 0, 85, 0.02); border-radius: 20px;
             border: 1px dashed var(--border); position: relative; z-index: 10;
         }
 
         .filter-buttons { margin: 20px 0; display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
         .filter-btn {
-            padding: 8px 18px; background: transparent; border: 1px solid var(--pink-neon);
-            color: var(--pink-neon); border-radius: 50px; font-weight: 600; font-size: 0.8rem; transition: 0.3s;
+            padding: 8px 15px; background: transparent; border: 1px solid var(--pink-neon);
+            color: var(--pink-neon); border-radius: 50px; font-weight: 600; font-size: 0.75rem; transition: 0.3s;
+            cursor: pointer;
         }
         .filter-btn.active { background: var(--pink-neon); color: white; box-shadow: 0 0 10px var(--pink-neon); }
 
@@ -56,22 +57,26 @@
             gap: 12px; max-width: 1100px; margin: 0 auto 80px; padding: 12px;
         }
         
-        @media (min-width: 768px) { .gallery { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); } }
+        @media (min-width: 768px) { .gallery { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); } }
 
         .gallery-item {
-            background: var(--card-bg); padding: 10px; border-radius: 15px;
+            background: var(--card-bg); padding: 8px; border-radius: 15px;
             border: 1px solid var(--border); transition: 0.3s; position: relative;
-            text-align: left; display: flex; flex-direction: column;
+            text-align: left; overflow: hidden;
         }
-        .gallery-item h3 { 
-            font-size: 0.8rem; margin: 8px 0 4px 0; color: white;
-            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+        .gallery-item img { width: 100%; height: 200px; object-fit: cover; border-radius: 10px; }
+        .gallery-item h3 { font-size: 0.8rem; margin: 8px 0 4px 0; color: white; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 2.2em; line-height: 1.1em; }
+        .gallery-item.hide { display: none; }
+
+        .fav-badge {
+            position: absolute; top: 12px; left: 12px; background: rgba(255, 0, 85, 0.8);
+            color: white; padding: 2px 6px; border-radius: 5px; font-size: 0.7rem; font-weight: bold;
         }
 
-        .status-info { color: var(--pink-neon); font-size: 0.65rem; font-weight: bold; letter-spacing: 0.5px; }
+        .status-label { color: var(--pink-neon); font-size: 0.6rem; text-transform: uppercase; font-weight: bold; letter-spacing: 0.5px; }
 
         .floating-contact { position: fixed; bottom: 20px; right: 20px; z-index: 100; }
-        .float-btn { width: 45px; height: 45px; border-radius: 50%; background: var(--pink-neon); color: white; border: none; font-size: 18px; box-shadow: 0 0 10px var(--pink-glow); }
+        .float-btn { width: 45px; height: 45px; border-radius: 50%; background: var(--pink-neon); color: white; border: none; font-size: 18px; box-shadow: 0 0 10px var(--pink-glow); cursor: pointer; }
 
         footer { padding: 30px; color: #55001a; font-size: 0.7rem; }
     </style>
@@ -97,8 +102,9 @@
 
     <div class="filter-buttons">
         <button class="filter-btn active" onclick="filterGallery('all')">SEMUA</button>
-        <button class="filter-btn" onclick="filterGallery('watching')">PROSES</button>
+        <button class="filter-btn" onclick="filterGallery('watching')">WATCHING</button>
         <button class="filter-btn" onclick="filterGallery('completed')">TAMAT</button>
+        <button class="filter-btn" onclick="filterGallery('belum')">BELUM</button>
     </div>
     
     <div class="gallery" id="anime-list"></div>
@@ -110,33 +116,35 @@
     particlesJS("particles-js", {"particles": {"number": {"value": 40}, "color": {"value": "#ff0055"}, "size": {"value": 1}, "move": {"enable": true, "speed": 1}}});
 
     const myAnimes = [
-        { title: "Tonikaku Kawaii", info: "[S1✅ | S2✅ | OVA✅] ❓", status: "completed" },
-        { title: "Spy X Family", info: "[S1✅ | S2✅ | S3📥] ❓", status: "watching" },
-        { title: "Horimiya", info: "[S1✅ | S2📥] ❓", status: "watching" },
-        { title: "Tsuki Ga Kirei", info: "📥", status: "watching" },
-        { title: "Chuunibyou Demo Koi Ga Shitai", info: "[S1⏳ | S2📥] 🔚", status: "watching" },
-        { title: "Shiro Seijo To Kuro Bokushi", info: "[S1✅] ❓", status: "completed" },
-        { title: "Giji Harem", info: "✅ 🔚", status: "completed" },
-        { title: "Tokidoki Bosotto Russia De Dereru Tonari No Alya San", info: "[S1✅ | S2📢]", status: "completed" },
-        { title: "The Angel Next Door Spoils Me Rotten", info: "[S1✅(rewatch 40x) | S2⏳]", status: "completed" },
-        { title: "The Girl I Like Forgot Her Glasses", info: "✅ ❓", status: "completed" },
-        { title: "Gimai Seikatsu", info: "✅❓", status: "completed" },
-        { title: "Kaoru Hana wa Rin to Saku", info: "✅❓", status: "completed" },
-        { title: "Taisho Otome Otogibanashi", info: "✅❓", status: "completed" },
-        { title: "Mamahaha no tsurego ga motokano datta", info: "✅❓", status: "completed" },
-        { title: "Kubo-san wa mob wo yurusanai", info: "✅❓", status: "completed" },
-        { title: "Kimi wa houkage insomnia", info: "✅❓", status: "completed" },
-        { title: "Bokiyou na senpai", info: "⏳", status: "watching" },
-        { title: "Yuru camp", info: "[S1⏳ | S2📥 | S3📥 | S4❓]", status: "watching" },
-        { title: "Seihantai na Kimi to Boku", info: "[S1✅ | S2📢]", status: "completed" },
-        { title: "Kimi ni todake", info: "⏳", status: "watching" }
+        { title: "Tonikaku Kawaii", status: "completed", fav: false, img: "https://cdn.myanimelist.net/images/anime/1613/108740.jpg" },
+        { title: "Spy X Family", status: "completed", fav: false, img: "https://cdn.myanimelist.net/images/anime/1441/122795.jpg" },
+        { title: "Horimiya", status: "completed", fav: false, img: "https://cdn.myanimelist.net/images/anime/1103/112246.jpg" },
+        { title: "Tsuki Ga Kirei", status: "belum", fav: false, img: "https://cdn.myanimelist.net/images/anime/13/84931.jpg" },
+        { title: "Chuunibyou Demo Koi Ga Shitai", status: "watching", fav: false, img: "https://cdn.myanimelist.net/images/anime/12/42881.jpg" },
+        { title: "Shiro Seijo To Kuro Bokushi", status: "completed", fav: false, img: "https://cdn.myanimelist.net/images/anime/1020/136743.jpg" },
+        { title: "Giji Harem", status: "completed", fav: true, img: "https://cdn.myanimelist.net/images/anime/1381/144122.jpg" },
+        { title: "Roshidere", status: "completed", fav: false, img: "https://cdn.myanimelist.net/images/anime/1816/143521.jpg" },
+        { title: "The Angel Next Door", status: "completed", fav: true, img: "https://cdn.myanimelist.net/images/anime/1989/154843.jpg" },
+        { title: "The Girl I Like Forgot Her Glasses", status: "completed", fav: true, img: "https://cdn.myanimelist.net/images/anime/1460/136365.jpg" },
+        { title: "Gimai Seikatsu", status: "completed", fav: true, img: "https://cdn.myanimelist.net/images/anime/1655/144111.jpg" },
+        { title: "Kaoru Hana wa Rin to Saku", status: "completed", fav: true, img: "https://cdn.myanimelist.net/images/anime/1589/145455.jpg" },
+        { title: "Taisho Otome Otogibanashi", status: "completed", fav: false, img: "https://cdn.myanimelist.net/images/anime/1090/118318.jpg" },
+        { title: "Mamahaha no Tsurego", status: "completed", fav: true, img: "https://cdn.myanimelist.net/images/anime/1990/124508.jpg" },
+        { title: "Kubo-san wa Mob wo Yurusanai", status: "completed", fav: true, img: "https://cdn.myanimelist.net/images/anime/1857/133092.jpg" },
+        { title: "Insomniacs After School", status: "completed", fav: true, img: "https://cdn.myanimelist.net/images/anime/1220/136005.jpg" },
+        { title: "Bokiyou na Senpai", status: "watching", fav: false, img: "https://cdn.myanimelist.net/images/anime/1660/147171.jpg" },
+        { title: "Yuru Camp", status: "completed", fav: true, img: "https://cdn.myanimelist.net/images/anime/1241/142385.jpg" },
+        { title: "Seihantai na Kimi to Boku", status: "completed", fav: false, img: "https://cdn.myanimelist.net/images/manga/1/263595.jpg" },
+        { title: "Kimi ni Todoke", status: "watching", fav: false, img: "https://cdn.myanimelist.net/images/anime/13/21431.jpg" }
     ];
 
     function renderAnime() {
         document.getElementById('anime-list').innerHTML = myAnimes.map(anime => `
             <div class="gallery-item ${anime.status}">
+                ${anime.fav ? '<div class="fav-badge">❤️ FAV</div>' : ''}
+                <img src="${anime.img}" alt="${anime.title}">
                 <h3>${anime.title}</h3>
-                <span class="status-info">${anime.info}</span>
+                <span class="status-label">${anime.status}</span>
             </div>
         `).join('');
     }
@@ -150,7 +158,10 @@
         });
     }
 
-    window.onload = () => { renderAnime(); setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString('id-ID'); }, 1000); };
+    window.onload = () => { 
+        renderAnime(); 
+        setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString('id-ID'); }, 1000); 
+    };
     </script>
 </body>
 </html>
