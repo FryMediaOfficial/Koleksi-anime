@@ -42,15 +42,13 @@
             border: 1px dashed var(--border); position: relative; z-index: 10;
         }
 
-        .filter-buttons { margin: 20px 0; display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
+        .filter-buttons { margin: 20px 0; display: flex; justify-content: center; gap: 6px; flex-wrap: wrap; padding: 0 10px; }
         .filter-btn {
-            padding: 8px 15px; background: transparent; border: 1px solid var(--pink-neon);
-            color: var(--pink-neon); border-radius: 50px; font-weight: 600; font-size: 0.75rem; transition: 0.3s;
-            cursor: pointer;
+            padding: 8px 12px; background: transparent; border: 1px solid var(--pink-neon);
+            color: var(--pink-neon); border-radius: 50px; font-weight: 600; font-size: 0.7rem; transition: 0.3s;
+            cursor: pointer; text-transform: uppercase;
         }
         .filter-btn.active { background: var(--pink-neon); color: white; box-shadow: 0 0 10px var(--pink-neon); }
-        /* Warna khusus tombol favorit */
-        .btn-fav.active { background: #ff0055; border-color: #fff; }
 
         .gallery {
             display: grid; grid-template-columns: repeat(2, 1fr); 
@@ -71,7 +69,13 @@
         .fav-badge {
             position: absolute; top: 12px; left: 12px; background: rgba(255, 0, 85, 0.9);
             color: white; padding: 2px 6px; border-radius: 5px; font-size: 0.65rem; font-weight: bold;
-            box-shadow: 0 0 5px rgba(0,0,0,0.5);
+            box-shadow: 0 0 5px rgba(0,0,0,0.5); z-index: 2;
+        }
+
+        .type-badge {
+            position: absolute; top: 12px; right: 12px; background: rgba(0, 0, 0, 0.7);
+            color: #fff; padding: 2px 6px; border-radius: 5px; font-size: 0.6rem; font-weight: bold;
+            border: 1px solid var(--border); z-index: 2;
         }
 
         .status-label { color: var(--pink-neon); font-size: 0.6rem; text-transform: uppercase; font-weight: bold; letter-spacing: 0.5px; }
@@ -93,7 +97,9 @@
 
     <div class="filter-buttons">
         <button class="filter-btn active" onclick="filterGallery('all')">SEMUA</button>
-        <button class="filter-btn btn-fav" onclick="filterGallery('is-fav')">FAVORIT ❤️</button>
+        <button class="filter-btn" onclick="filterGallery('is-fav')">FAVORIT ❤️</button>
+        <button class="filter-btn" onclick="filterGallery('type-tv')">TV</button>
+        <button class="filter-btn" onclick="filterGallery('type-movie')">MOVIE</button>
         <button class="filter-btn" onclick="filterGallery('watching')">WATCHING</button>
         <button class="filter-btn" onclick="filterGallery('completed')">TAMAT</button>
         <button class="filter-btn" onclick="filterGallery('belum')">BELUM</button>
@@ -108,32 +114,33 @@
     particlesJS("particles-js", {"particles": {"number": {"value": 40}, "color": {"value": "#ff0055"}, "size": {"value": 1}, "move": {"enable": true, "speed": 1}}});
 
     const myAnimes = [
-        { title: "Tonikaku Kawaii", status: "completed", fav: false, img: "https://myanimelist.net/images/anime/1613/108722.jpg" },
-        { title: "Spy X Family", status: "completed", fav: false, img: "https://cdn.myanimelist.net/images/anime/1441/122795.jpg" },
-        { title: "Horimiya", status: "completed", fav: false, img: "https://myanimelist.net/images/anime/1695/111486.jpg" },
-        { title: "Tsuki Ga Kirei", status: "belum", fav: false, img: "https://myanimelist.net/images/anime/2/85592.jpg" },
-        { title: "Chuunibyou Demo Koi Ga Shitai", status: "watching", fav: false, img: "https://myanimelist.net/images/anime/7/56643.jpg" },
-        { title: "Shiro Seijo To Kuro Bokushi", status: "completed", fav: false, img: "https://myanimelist.net/images/anime/1329/135096.jpg" },
-        { title: "Giji Harem", status: "completed", fav: true, img: "https://myanimelist.net/images/anime/1607/143547.jpg" },
-        { title: "Roshidere", status: "completed", fav: false, img: "https://myanimelist.net/images/anime/1596/152806.jpg" },
-        { title: "The Angel Next Door", status: "completed", fav: true, img: "https://cdn.myanimelist.net/images/anime/1989/154843.jpg" },
-        { title: "The Girl I Like Forgot Her Glasses", status: "completed", fav: true, img: "https://myanimelist.net/images/anime/1582/136325.jpg" },
-        { title: "Gimai Seikatsu", status: "completed", fav: true, img: "https://myanimelist.net/images/anime/1420/143707.jpg" },
-        { title: "Kaoru Hana wa Rin to Saku", status: "completed", fav: true, img: "https://myanimelist.net/images/anime/1744/150433.jpg" },
-        { title: "Taisho Otome Otogibanashi", status: "completed", fav: false, img: "https://myanimelist.net/images/anime/1662/118849.jpg" },
-        { title: "Mamahaha no Tsurego", status: "completed", fav: true, img: "https://myanimelist.net/images/anime/1708/123281.jpg" },
-        { title: "Kubo-san wa Mob wo Yurusanai", status: "completed", fav: true, img: "https://myanimelist.net/images/anime/1818/132330.jpg" },
-        { title: "Insomniacs After School", status: "completed", fav: true, img: "https://myanimelist.net/images/anime/1402/134007.jpg" },
-        { title: "Bokiyou na Senpai", status: "watching", fav: false, img: "https://myanimelist.net/images/anime/1257/152233.jpg" },
-        { title: "Yuru Camp", status: "completed", fav: true, img: "https://myanimelist.net/images/anime/4/89877.jpg" },
-        { title: "Seihantai na Kimi to Boku", status: "completed", fav: false, img: "https://myanimelist.net/images/anime/1140/154457.jpg" },
-        { title: "Kimi ni Todoke", status: "watching", fav: false, img: "https://myanimelist.net/images/anime/1311/121574.jpg" }
+        { title: "Tonikaku Kawaii", status: "completed", type: "tv", fav: false, img: "https://myanimelist.net/images/anime/1613/108722.jpg" },
+        { title: "Spy X Family", status: "completed", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/1441/122795.jpg" },
+        { title: "Horimiya", status: "completed", type: "tv", fav: false, img: "https://myanimelist.net/images/anime/1695/111486.jpg" },
+        { title: "Tsuki Ga Kirei", status: "belum", type: "tv", fav: false, img: "https://myanimelist.net/images/anime/2/85592.jpg" },
+        { title: "Chuunibyou Demo Koi Ga Shitai", status: "watching", type: "tv", fav: false, img: "https://myanimelist.net/images/anime/7/56643.jpg" },
+        { title: "Shiro Seijo To Kuro Bokushi", status: "completed", type: "tv", fav: false, img: "https://myanimelist.net/images/anime/1329/135096.jpg" },
+        { title: "Giji Harem", status: "completed", type: "tv", fav: true, img: "https://myanimelist.net/images/anime/1607/143547.jpg" },
+        { title: "Roshidere", status: "completed", type: "tv", fav: false, img: "https://myanimelist.net/images/anime/1596/152806.jpg" },
+        { title: "The Angel Next Door", status: "completed", type: "tv", fav: true, img: "https://cdn.myanimelist.net/images/anime/1989/154843.jpg" },
+        { title: "The Girl I Like Forgot Her Glasses", status: "completed", type: "tv", fav: true, img: "https://myanimelist.net/images/anime/1582/136325.jpg" },
+        { title: "Gimai Seikatsu", status: "completed", type: "tv", fav: true, img: "https://myanimelist.net/images/anime/1420/143707.jpg" },
+        { title: "Kaoru Hana wa Rin to Saku", status: "completed", type: "tv", fav: true, img: "https://myanimelist.net/images/anime/1744/150433.jpg" },
+        { title: "Taisho Otome Otogibanashi", status: "completed", type: "tv", fav: false, img: "https://myanimelist.net/images/anime/1662/118849.jpg" },
+        { title: "Mamahaha no Tsurego", status: "completed", type: "tv", fav: true, img: "https://myanimelist.net/images/anime/1708/123281.jpg" },
+        { title: "Kubo-san wa Mob wo Yurusanai", status: "completed", type: "tv", fav: true, img: "https://myanimelist.net/images/anime/1818/132330.jpg" },
+        { title: "Insomniacs After School", status: "completed", type: "tv", fav: true, img: "https://myanimelist.net/images/anime/1402/134007.jpg" },
+        { title: "Bokiyou na Senpai", status: "watching", type: "tv", fav: false, img: "https://myanimelist.net/images/anime/1257/152233.jpg" },
+        { title: "Yuru Camp", status: "completed", type: "tv", fav: true, img: "https://myanimelist.net/images/anime/4/89877.jpg" },
+        { title: "Seihantai na Kimi to Boku", status: "completed", type: "tv", fav: false, img: "https://myanimelist.net/images/anime/1140/154457.jpg" },
+        { title: "Kimi ni Todoke", status: "watching", type: "tv", fav: false, img: "https://myanimelist.net/images/anime/1311/121574.jpg" }
     ];
 
     function renderAnime() {
         document.getElementById('anime-list').innerHTML = myAnimes.map(anime => `
-            <div class="gallery-item ${anime.status} ${anime.fav ? 'is-fav' : ''}">
+            <div class="gallery-item ${anime.status} ${anime.fav ? 'is-fav' : ''} type-${anime.type}">
                 ${anime.fav ? '<div class="fav-badge">❤️</div>' : ''}
+                <div class="type-badge">${anime.type.toUpperCase()}</div>
                 <img src="${anime.img}" alt="${anime.title}">
                 <h3>${anime.title}</h3>
                 <span class="status-label">${anime.status}</span>
