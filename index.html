@@ -36,74 +36,65 @@
             transition: width 0.2s, height 0.2s;
             display: flex; align-items: center; justify-content: center; font-size: 10px;
         }
-        .cursor-hover-active {
-            width: 50px !important; height: 50px !important;
-            background: rgba(255, 0, 85, 0.1) !important;
-        }
+        .cursor-hover-active { width: 50px !important; height: 50px !important; background: rgba(255, 0, 85, 0.1) !important; }
 
         #particles-js { position: fixed; width: 100%; height: 100%; top: 0; left: 0; z-index: -1; }
 
         header { 
-            padding: 30px 5%; background: rgba(13, 0, 5, 0.85); 
+            padding: 20px 5%; background: rgba(13, 0, 5, 0.85); 
             border-bottom: 2px solid var(--border); position: relative; z-index: 10;
             backdrop-filter: blur(10px); display: flex; flex-direction: column; align-items: center;
         }
 
-        .clock-container {
-            font-size: 1.5rem; color: var(--pink-neon); font-weight: bold; margin: 0 0 10px 0;
-            filter: drop-shadow(0 0 5px var(--pink-glow));
-        }
-        #clock { letter-spacing: 2px; }
+        .clock-container { font-size: 1.2rem; color: var(--pink-neon); font-weight: bold; margin-bottom: 5px; }
 
         .glowing-title {
-            font-size: 2.2rem; font-weight: bold; letter-spacing: 5px; margin: 0;
-            color: var(--pink-neon); animation: glow 2s ease-in-out infinite alternate;
-        }
-        @keyframes glow {
-            from { filter: drop-shadow(0 0 5px var(--pink-glow)); }
-            to { filter: drop-shadow(0 0 15px var(--pink-neon)); }
+            font-size: 1.8rem; font-weight: bold; letter-spacing: 3px; margin: 0;
+            color: var(--pink-neon); filter: drop-shadow(0 0 8px var(--pink-glow));
         }
 
         .main-container {
-            max-width: 900px; margin: 50px auto; padding: 40px; 
-            background: rgba(255, 0, 85, 0.02); border-radius: 30px;
-            border: 2px dashed var(--border); position: relative; z-index: 10;
-            backdrop-filter: blur(5px);
+            max-width: 900px; margin: 30px auto; padding: 25px; 
+            background: rgba(255, 0, 85, 0.02); border-radius: 20px;
+            border: 1px dashed var(--border); position: relative; z-index: 10;
         }
 
-        .filter-buttons { margin: 40px 0 30px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+        .filter-buttons { margin: 20px 0; display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
         .filter-btn {
-            padding: 10px 25px; background: transparent; border: 1px solid var(--pink-neon);
-            color: var(--pink-neon); border-radius: 50px; font-weight: 600; cursor: none; transition: 0.3s;
+            padding: 8px 18px; background: transparent; border: 1px solid var(--pink-neon);
+            color: var(--pink-neon); border-radius: 50px; font-weight: 600; font-size: 0.8rem; transition: 0.3s;
         }
-        .filter-btn.active, .filter-btn:hover { background: var(--pink-neon); color: white; box-shadow: 0 0 15px var(--pink-neon); }
+        .filter-btn.active { background: var(--pink-neon); color: white; box-shadow: 0 0 10px var(--pink-neon); }
 
         .gallery {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 25px; max-width: 1100px; margin: 0 auto 80px; padding: 20px;
+            display: grid; 
+            grid-template-columns: repeat(2, 1fr); /* JADI 2 KOLOM DI HP 📱 */
+            gap: 15px; max-width: 1100px; margin: 0 auto 80px; padding: 15px;
         }
+        
+        @media (min-width: 768px) { .gallery { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); } }
+
         .gallery-item {
-            background: var(--card-bg); padding: 15px; border-radius: 20px;
-            border: 1px solid var(--border); transition: 0.4s; position: relative;
+            background: var(--card-bg); padding: 10px; border-radius: 15px;
+            border: 1px solid var(--border); transition: 0.3s; position: relative;
+            text-align: left;
         }
+        .gallery-item img { width: 100%; height: 220px; object-fit: cover; border-radius: 10px; }
+        .gallery-item h3 { font-size: 0.9rem; margin: 10px 0 5px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .gallery-item.hide { display: none; }
-        .gallery-item:hover { transform: translateY(-10px); border-color: var(--pink-neon); }
-        .gallery-item img { width: 100%; height: 350px; object-fit: cover; border-radius: 15px; }
 
         .rating-badge {
-            position: absolute; top: 20px; right: 20px; background: rgba(0,0,0,0.8);
-            padding: 5px 12px; border-radius: 10px; border: 1px solid var(--pink-neon); font-size: 0.9rem;
+            position: absolute; top: 15px; right: 15px; background: rgba(0,0,0,0.8);
+            padding: 3px 8px; border-radius: 8px; border: 1px solid var(--pink-neon); font-size: 0.7rem;
             color: var(--pink-neon); font-weight: bold;
         }
 
-        .floating-contact { position: fixed; bottom: 30px; right: 30px; z-index: 100; }
-        .float-btn {
-            width: 50px; height: 50px; border-radius: 50%; background: var(--pink-neon);
-            display: flex; align-items: center; justify-content: center;
-            color: white; border: none; font-size: 20px; transition: 0.3s;
-        }
+        .status-label { color: var(--pink-neon); font-size: 0.7rem; text-transform: uppercase; font-weight: bold; }
 
-        footer { padding: 40px; color: #55001a; font-size: 0.8rem; }
+        .floating-contact { position: fixed; bottom: 20px; right: 20px; z-index: 100; }
+        .float-btn { width: 45px; height: 45px; border-radius: 50%; background: var(--pink-neon); color: white; border: none; font-size: 18px; }
+
+        footer { padding: 30px; color: #55001a; font-size: 0.7rem; }
     </style>
 </head>
 <body>
@@ -118,15 +109,11 @@
 
     <header>
         <div class="clock-container"><span id="clock">00:00:00</span></div>
-        <h1 class="glowing-title glitch" data-text="ANIME VAULT">ANIME VAULT</h1>
+        <h1 class="glowing-title">ANIME VAULT</h1>
     </header>
 
     <div class="main-container">
-        <h2 style="color: var(--pink-neon); letter-spacing: 3px;">COLLECTION</h2>
-        <p style="color: var(--text-light); line-height: 1.8;">
-            Tempat Sandi ngerawat daftar anime favorit. <br> 
-            Tanda kalau kamu sudah masuk zona Panglima. 💖
-        </p>
+        <p style="color: var(--text-light); margin:0; font-size: 0.9rem;">Daftar Anime Pilihan Sang Panglima 💖</p>
     </div>
 
     <div class="filter-buttons">
@@ -135,22 +122,20 @@
         <button class="filter-btn" onclick="filterGallery('completed')">TAMAT</button>
     </div>
     
-    <div class="gallery" id="anime-list">
-        </div>
+    <div class="gallery" id="anime-list"></div>
 
-    <footer>&copy; 2026 FryMediaOfficial. Personalized Anime Vault.</footer>
+    <footer>&copy; 2026 FryMediaOfficial</footer>
 
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <script>
-    particlesJS("particles-js", {"particles": {"number": {"value": 50}, "color": {"value": "#ff0055"}, "size": {"value": 1}, "move": {"enable": true, "speed": 1}}});
+    particlesJS("particles-js", {"particles": {"number": {"value": 40}, "color": {"value": "#ff0055"}, "size": {"value": 1}, "move": {"enable": true, "speed": 1}}});
 
-    // DATA ANIME (Gambar Tenshi-sama udah masuk Sandi 🗿)
     const myAnimes = [
         {
             title: "Otonari no Tenshi-sama",
             status: "completed",
             image: "https://myanimelist.net/images/anime/1989/154843.jpg",
-            rating: "10/10"
+            rating: "100/10"
         },
         {
             title: "One Piece",
@@ -163,10 +148,10 @@
     function renderAnime() {
         document.getElementById('anime-list').innerHTML = myAnimes.map(anime => `
             <div class="gallery-item ${anime.status}">
-                <div class="rating-badge">⭐ ${anime.rating}</div>
+                <div class="rating-badge">⭐ ${anime.rating.split('/')[0]}</div>
                 <img src="${anime.image}">
-                <h3 style="color:white;">${anime.title}</h3>
-                <p style="color:var(--pink-neon); font-size:0.8rem; text-transform:uppercase; letter-spacing:1px;">${anime.status}</p>
+                <h3>${anime.title}</h3>
+                <span class="status-label">${anime.status}</span>
             </div>
         `).join('');
     }
@@ -174,17 +159,8 @@
     const dot = document.getElementById("cursor-dot");
     const outline = document.getElementById("cursor-outline");
     let mouseX = -100, mouseY = -100, outlineX = -100, outlineY = -100;
-
-    window.addEventListener("mousemove", e => {
-        mouseX = e.clientX; mouseY = e.clientY;
-        dot.style.left = mouseX + "px"; dot.style.top = mouseY + "px";
-    });
-
-    function animateCursor() { 
-        outlineX += (mouseX - outlineX) * 0.15; outlineY += (mouseY - outlineY) * 0.15; 
-        outline.style.left = outlineX + "px"; outline.style.top = outlineY + "px"; 
-        requestAnimationFrame(animateCursor); 
-    }
+    window.addEventListener("mousemove", e => { mouseX = e.clientX; mouseY = e.clientY; dot.style.left = mouseX + "px"; dot.style.top = mouseY + "px"; });
+    function animateCursor() { outlineX += (mouseX - outlineX) * 0.15; outlineY += (mouseY - outlineY) * 0.15; outline.style.left = outlineX + "px"; outline.style.top = outlineY + "px"; requestAnimationFrame(animateCursor); }
     animateCursor();
 
     function filterGallery(category) {
@@ -194,10 +170,7 @@
         document.querySelectorAll('.gallery-item').forEach(item => { (category === 'all' || item.classList.contains(category)) ? item.classList.remove('hide') : item.classList.add('hide'); });
     }
 
-    window.onload = () => {
-        renderAnime();
-        setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString('id-ID'); }, 1000);
-    };
+    window.onload = () => { renderAnime(); setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString('id-ID'); }, 1000); };
     </script>
 </body>
 </html>
