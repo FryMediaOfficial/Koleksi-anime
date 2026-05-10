@@ -22,7 +22,7 @@
             overflow-x: hidden; scroll-behavior: smooth;
         }
 
-        /* --- CURSOR LOGIC --- */
+        /* --- CURSOR ANIMATION (BALIK LAGI JIR 🗿🔥) --- */
         * { cursor: none !important; }
         #cursor-dot {
             width: 8px; height: 8px; background: var(--pink-neon); 
@@ -33,10 +33,13 @@
             width: 30px; height: 30px; border: 2px solid var(--pink-neon); 
             position: fixed; border-radius: 50%; pointer-events: none;
             z-index: 9999; transform: translate(-50%, -50%); left: -100px; top: -100px;
-            transition: width 0.2s, height 0.2s;
+            transition: width 0.2s, height 0.2s, background 0.2s;
             display: flex; align-items: center; justify-content: center; font-size: 10px;
         }
-        .cursor-hover-active { width: 50px !important; height: 50px !important; background: rgba(255, 0, 85, 0.1) !important; }
+        .cursor-hover-active {
+            width: 50px !important; height: 50px !important;
+            background: rgba(255, 0, 85, 0.15) !important;
+        }
 
         #particles-js { position: fixed; width: 100%; height: 100%; top: 0; left: 0; z-index: -1; }
 
@@ -54,7 +57,7 @@
         }
 
         .main-container {
-            max-width: 900px; margin: 30px auto; padding: 25px; 
+            max-width: 900px; margin: 25px auto; padding: 20px; 
             background: rgba(255, 0, 85, 0.02); border-radius: 20px;
             border: 1px dashed var(--border); position: relative; z-index: 10;
         }
@@ -68,7 +71,7 @@
 
         .gallery {
             display: grid; 
-            grid-template-columns: repeat(2, 1fr); /* JADI 2 KOLOM DI HP 📱 */
+            grid-template-columns: repeat(2, 1fr); 
             gap: 15px; max-width: 1100px; margin: 0 auto 80px; padding: 15px;
         }
         
@@ -80,7 +83,7 @@
             text-align: left;
         }
         .gallery-item img { width: 100%; height: 220px; object-fit: cover; border-radius: 10px; }
-        .gallery-item h3 { font-size: 0.9rem; margin: 10px 0 5px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .gallery-item h3 { font-size: 0.85rem; margin: 10px 0 5px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: white; }
         .gallery-item.hide { display: none; }
 
         .rating-badge {
@@ -89,10 +92,10 @@
             color: var(--pink-neon); font-weight: bold;
         }
 
-        .status-label { color: var(--pink-neon); font-size: 0.7rem; text-transform: uppercase; font-weight: bold; }
+        .status-label { color: var(--pink-neon); font-size: 0.65rem; text-transform: uppercase; font-weight: bold; letter-spacing: 1px; }
 
         .floating-contact { position: fixed; bottom: 20px; right: 20px; z-index: 100; }
-        .float-btn { width: 45px; height: 45px; border-radius: 50%; background: var(--pink-neon); color: white; border: none; font-size: 18px; }
+        .float-btn { width: 45px; height: 45px; border-radius: 50%; background: var(--pink-neon); color: white; border: none; font-size: 18px; box-shadow: 0 0 10px var(--pink-glow); }
 
         footer { padding: 30px; color: #55001a; font-size: 0.7rem; }
     </style>
@@ -113,7 +116,9 @@
     </header>
 
     <div class="main-container">
-        <p style="color: var(--text-light); margin:0; font-size: 0.9rem;">Daftar Anime Pilihan Sang Panglima 💖</p>
+        <p style="color: var(--text-light); margin:0; font-size: 0.85rem; font-style: italic;">
+            Daftar Anime Pilihan Sanzs 💖
+        </p>
     </div>
 
     <div class="filter-buttons">
@@ -124,7 +129,7 @@
     
     <div class="gallery" id="anime-list"></div>
 
-    <footer>&copy; 2026 FryMediaOfficial</footer>
+    <footer>&copy; 2026 FryMediaOfficial | Sanzs' Vault</footer>
 
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <script>
@@ -135,13 +140,19 @@
             title: "Otonari no Tenshi-sama",
             status: "completed",
             image: "https://myanimelist.net/images/anime/1989/154843.jpg",
-            rating: "100/10"
+            rating: "10/10"
         },
         {
             title: "One Piece",
             status: "watching",
             image: "https://cdn.myanimelist.net/images/anime/1244/138851.jpg",
             rating: "9.5/10"
+        },
+        {
+            title: "Solo Leveling",
+            status: "completed",
+            image: "https://cdn.myanimelist.net/images/anime/1258/126920.jpg",
+            rating: "8.5/10"
         }
     ];
 
@@ -156,12 +167,30 @@
         `).join('');
     }
 
+    // --- LOGIKA CURSOR BALIK LAGI ---
     const dot = document.getElementById("cursor-dot");
     const outline = document.getElementById("cursor-outline");
     let mouseX = -100, mouseY = -100, outlineX = -100, outlineY = -100;
-    window.addEventListener("mousemove", e => { mouseX = e.clientX; mouseY = e.clientY; dot.style.left = mouseX + "px"; dot.style.top = mouseY + "px"; });
-    function animateCursor() { outlineX += (mouseX - outlineX) * 0.15; outlineY += (mouseY - outlineY) * 0.15; outline.style.left = outlineX + "px"; outline.style.top = outlineY + "px"; requestAnimationFrame(animateCursor); }
+
+    window.addEventListener("mousemove", e => {
+        mouseX = e.clientX; mouseY = e.clientY;
+        dot.style.left = mouseX + "px"; dot.style.top = mouseY + "px";
+    });
+
+    function animateCursor() { 
+        outlineX += (mouseX - outlineX) * 0.15; outlineY += (mouseY - outlineY) * 0.15; 
+        outline.style.left = outlineX + "px"; outline.style.top = outlineY + "px"; 
+        requestAnimationFrame(animateCursor); 
+    }
     animateCursor();
+
+    // Hover effect biar outline cursor-nya membesar
+    document.addEventListener("mouseover", e => { 
+        if (e.target.closest('button, .gallery-item')) outline.classList.add("cursor-hover-active"); 
+    });
+    document.addEventListener("mouseout", e => { 
+        if (e.target.closest('button, .gallery-item')) outline.classList.remove("cursor-hover-active"); 
+    });
 
     function filterGallery(category) {
         const buttons = document.querySelectorAll('.filter-btn');
