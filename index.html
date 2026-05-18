@@ -5,6 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Anime Vault | FryMediaOfficial</title>
     <style>
+        /* Proteksi ekstra agar teks di web tidak bisa di-block/seleksi */
+body {
+    -webkit-user-select: none; /* Safari */
+    -ms-user-select: none;     /* IE 10 dan versi setelahnya */
+    user-select: none;         /* Standar standar browser modern */
+}
+        
         :root {
             --pink-neon: #ff0055;
             --pink-glow: rgba(255, 0, 85, 0.4);
@@ -373,6 +380,36 @@
         renderAnime(); 
         setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString('id-ID'); }, 1000); 
     };
+
+        <script>
+        // 1. Matikan klik kanan agar aset/gambar aman dari salinan biasa
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+        });
+
+        // 2. Matikan shortcut keyboard bawaan inspeksi inspect element
+        document.onkeydown = function(e) {
+            // Blokir tombol F12
+            if (e.keyCode == 123) {
+                return false;
+            }
+            // Blokir Ctrl + Shift + I (Inspect Element)
+            if (e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) {
+                return false;
+            }
+            // Blokir Ctrl + Shift + C (Select Element)
+            if (e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) {
+                return false;
+            }
+            // Blokir Ctrl + Shift + J (Developer Console)
+            if (e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) {
+                return false;
+            }
+            // Blokir Ctrl + U (View Source Code)
+            if (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) {
+                return false;
+            }
+        };
     </script>
 </body>
 </html>
