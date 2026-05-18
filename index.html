@@ -42,7 +42,19 @@
             border: 1px dashed var(--border); position: relative; z-index: 10;
         }
 
-        .filter-buttons { margin: 20px 0; display: flex; justify-content: center; gap: 6px; flex-wrap: wrap; padding: 0 10px; }
+        /* FITUR PENCARIAN */
+        .search-container {
+            margin: 15px auto; max-width: 400px; padding: 0 15px;
+        }
+        .search-bar {
+            width: 100%; padding: 10px 15px; border-radius: 50px;
+            border: 1px solid var(--pink-neon); background: rgba(30, 0, 14, 0.6);
+            color: white; font-size: 0.9rem; outline: none; box-sizing: border-box;
+            transition: 0.3s; text-align: center;
+        }
+        .search-bar:focus { box-shadow: 0 0 10px var(--pink-neon); }
+
+        .filter-buttons { margin: 10px 0 20px 0; display: flex; justify-content: center; gap: 6px; flex-wrap: wrap; padding: 0 10px; }
         .filter-btn {
             padding: 8px 12px; background: transparent; border: 1px solid var(--pink-neon);
             color: var(--pink-neon); border-radius: 50px; font-weight: 600; font-size: 0.7rem; transition: 0.3s;
@@ -60,8 +72,9 @@
         .gallery-item {
             background: var(--card-bg); padding: 8px; border-radius: 15px;
             border: 1px solid var(--border); transition: 0.3s; position: relative;
-            text-align: left; overflow: hidden;
+            text-align: left; overflow: hidden; cursor: pointer;
         }
+        .gallery-item:hover { transform: translateY(-5px); box-shadow: 0 5px 15px var(--pink-glow); }
         .gallery-item img { width: 100%; height: 200px; object-fit: cover; border-radius: 10px; }
         .gallery-item h3 { font-size: 0.8rem; margin: 8px 0 4px 0; color: white; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 2.2em; line-height: 1.1em; }
         .gallery-item.hide { display: none !important; }
@@ -79,6 +92,48 @@
         }
 
         .status-label { color: var(--pink-neon); font-size: 0.6rem; text-transform: uppercase; font-weight: bold; letter-spacing: 0.5px; }
+        
+        /* POP-UP MODAL PLAYER STYLE */
+        .modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(13, 0, 5, 0.9); z-index: 1000;
+            display: flex; justify-content: center; align-items: center;
+            opacity: 0; pointer-events: none; transition: 0.3s ease;
+        }
+        .modal.show { opacity: 1; pointer-events: auto; }
+        .modal-content {
+            background: #1e000e; width: 90%; max-width: 700px;
+            padding: 20px; border-radius: 20px; border: 2px solid var(--pink-neon);
+            box-shadow: 0 0 25px var(--pink-neon); position: relative;
+            text-align: center;
+        }
+        .close-btn {
+            position: absolute; top: -15px; right: -15px; width: 35px; height: 35px;
+            background: var(--pink-neon); border: none; border-radius: 50%;
+            color: white; font-weight: bold; font-size: 1.1rem; cursor: pointer;
+            box-shadow: 0 0 10px var(--pink-neon);
+        }
+        .video-container {
+            position: relative; width: 100%; padding-bottom: 56.25%; /* 16:9 Ratio */
+            height: 0; border-radius: 10px; overflow: hidden; background: #000;
+            margin-top: 15px;
+        }
+        .video-container iframe {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;
+        }
+
+        /* IKLAN LAYER */
+        .ads-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(20, 0, 10, 0.95); display: flex; flex-direction: column;
+            justify-content: center; align-items: center; z-index: 10; border-radius: 10px;
+        }
+        .ads-btn {
+            padding: 12px 24px; background: var(--pink-neon); border: none;
+            color: white; font-weight: bold; border-radius: 50px; cursor: pointer;
+            box-shadow: 0 0 15px var(--pink-neon); font-size: 0.9rem; text-transform: uppercase;
+        }
+
         footer { padding: 30px; color: #55001a; font-size: 0.7rem; }
     </style>
 </head>
@@ -92,20 +147,41 @@
     </header>
 
     <div class="main-container">
-        <p style="color: var(--text-light); margin:0; font-size: 0.85rem; font-style: italic;">Daftar Anime Pilihan Sanzs 💖</p>
+        <p style="color: var(--text-light); margin:0; font-size: 0.85rem; font-style: italic;">Daftar & Streaming Anime Pilihan Sanzs 💖</p>
+    </div>
+
+    <!-- FITUR INPUT SEARCH -->
+    <div class="search-container">
+        <input type="text" id="searchAnime" class="search-bar" placeholder="Cari judul anime kamu di sini..." onkeyup="searchAnimeFunc()">
     </div>
 
     <div class="filter-buttons">
-        <button class="filter-btn active" onclick="filterGallery('all')">SEMUA</button>
-        <button class="filter-btn" onclick="filterGallery('is-fav')">FAVORIT ❤️</button>
-        <button class="filter-btn" onclick="filterGallery('type-tv')">TV</button>
-        <button class="filter-btn" onclick="filterGallery('type-movie')">MOVIE</button>
-        <button class="filter-btn" onclick="filterGallery('watching')">WATCHING</button>
-        <button class="filter-btn" onclick="filterGallery('completed')">TAMAT</button>
-        <button class="filter-btn" onclick="filterGallery('belum')">BELUM</button>
+        <button class="filter-btn active" onclick="filterGallery('all', this)">SEMUA</button>
+        <button class="filter-btn" onclick="filterGallery('is-fav', this)">FAVORIT ❤️</button>
+        <button class="filter-btn" onclick="filterGallery('type-tv', this)">TV</button>
+        <button class="filter-btn" onclick="filterGallery('type-movie', this)">MOVIE</button>
+        <button class="filter-btn" onclick="filterGallery('watching', this)">WATCHING</button>
+        <button class="filter-btn" onclick="filterGallery('completed', this)">TAMAT</button>
+        <button class="filter-btn" onclick="filterGallery('belum', this)">BELUM</button>
     </div>
     
     <div class="gallery" id="anime-list"></div>
+
+    <!-- POP-UP PLAYER MODAL -->
+    <div id="playerModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closePlayer()">X</button>
+            <h2 id="modalTitle" style="margin: 0; font-size: 1.2rem; color: white;">Stream Player</h2>
+            <div class="video-container">
+                <!-- Lapisan Iklan -->
+                <div id="adsLayer" class="ads-overlay">
+                    <p style="font-size: 0.85rem; margin-bottom: 15px;">Sponsori FryMedia dengan mengeklik tombol di bawah ini untuk menonton!</p>
+                    <button class="ads-btn" onclick="triggerAd()">Saksikan & Lewati Iklan 🚀</button>
+                </div>
+                <iframe id="videoPlayer" src="" allowfullscreen></iframe>
+            </div>
+        </div>
+    </div>
 
     <footer>&copy; 2026 FryMediaOfficial | Sanzs' Vault</footer>
 
@@ -113,137 +189,41 @@
     <script>
     particlesJS("particles-js", {"particles": {"number": {"value": 40}, "color": {"value": "#ff0055"}, "size": {"value": 1}, "move": {"enable": true, "speed": 1}}});
 
+    // DATA ANIME SEMENTARA (Nanti tinggal dipindah ke database.js)
     const myAnimes = [
-        // --- EXISTING DATA ---
-        { title: "Tonikaku Kawaii", status: "completed", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/1613/108722.jpg" },
-        { title: "Spy X Family", status: "completed", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/1441/122795.jpg" },
-        { title: "Horimiya", status: "completed", type: "tv", fav: false, img: "https://myanimelist.net/images/anime/1695/111486.jpg" },
-        { title: "Tsuki Ga Kirei", status: "belum", type: "tv", fav: false, img: "https://myanimelist.net/images/anime/2/85592.jpg" },
-        { title: "Chuunibyou Demo Koi Ga Shitai", status: "watching", type: "tv", fav: false, img: "https://myanimelist.net/images/anime/7/56643.jpg" },
-        { title: "Shiro Seijo To Kuro Bokushi", status: "completed", type: "tv", fav: false, img: "https://myanimelist.net/images/anime/1329/135096.jpg" },
-        { title: "Giji Harem", status: "completed", type: "tv", fav: true, img: "https://myanimelist.net/images/anime/1607/143547.jpg" },
-        { title: "Roshidere", status: "completed", type: "tv", fav: false, img: "https://myanimelist.net/images/anime/1596/152806.jpg" },
-        { title: "The Angel Next Door", status: "completed", type: "tv", fav: true, img: "https://cdn.myanimelist.net/images/anime/1989/154843.jpg" },
-        { title: "The Girl I Like Forgot Her Glasses", status: "completed", type: "tv", fav: true, img: "https://myanimelist.net/images/anime/1582/136325.jpg" },
-        { title: "Gimai Seikatsu", status: "completed", type: "tv", fav: true, img: "https://myanimelist.net/images/anime/1420/143707.jpg" },
-        { title: "Kaoru Hana wa Rin to Saku", status: "completed", type: "tv", fav: true, img: "https://myanimelist.net/images/anime/1744/150433.jpg" },
-        { title: "Taisho Otome Otogibanashi", status: "completed", type: "tv", fav: false, img: "https://myanimelist.net/images/anime/1662/118849.jpg" },
-        { title: "Mamahaha no Tsurego", status: "completed", type: "tv", fav: true, img: "https://myanimelist.net/images/anime/1708/123281.jpg" },
-        { title: "Kubo-san wa Mob wo Yurusanai", status: "completed", type: "tv", fav: true, img: "https://myanimelist.net/images/anime/1818/132330.jpg" },
-        { title: "Insomniacs After School", status: "completed", type: "tv", fav: true, img: "https://myanimelist.net/images/anime/1402/134007.jpg" },
-        { title: "Bokiyou na Senpai", status: "watching", type: "tv", fav: false, img: "https://myanimelist.net/images/anime/1257/152233.jpg" },
-        { title: "Yuru Camp", status: "completed", type: "tv", fav: true, img: "https://myanimelist.net/images/anime/4/89877.jpg" },
-        { title: "Seihantai na Kimi to Boku", status: "completed", type: "tv", fav: false, img: "https://myanimelist.net/images/anime/1140/154457.jpg" },
-        { title: "Kimi ni Todoke", status: "watching", type: "tv", fav: false, img: "https://myanimelist.net/images/anime/1502/124384.jpg" },
-        { title: "Kono Kaisha ni Suki na Hito ga Imasu", status: "watching", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/1123/146384.jpg" },
-
-        // --- NEW TV SERIES (STATUS: BELUM) ---
-        { title: "Shigatsu wa Kimi no Uso", status: "belum", type: "tv", fav: false, img: "https://myanimelist.net/images/anime/1405/143284.jpg" },
-        { title: "Toradora!", status: "belum", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/13/22128.jpg" },
-        { title: "Clannad", status: "belum", type: "tv", fav: false, img: "https://myanimelist.net/images/anime/13/75650.jpg" },
-        { title: "Kaguya-sama: Love is War", status: "belum", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/1295/106551.jpg" },
-        { title: "Fruits Basket", status: "belum", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/1447/99827.jpg" },
-        { title: "Oregairu", status: "belum", type: "tv", fav: false, img: "https://myanimelist.net/images/anime/1786/120117.jpg" },
-        { title: "Seishun Buta Yarou", status: "belum", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/1301/93586.jpg" },
-        { title: "Kaichou wa Maid-sama!", status: "belum", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/6/25254.jpg" },
-        { title: "Sukitte Ii na yo", status: "belum", type: "tv", fav: false, img: "https://myanimelist.net/images/manga/3/198567.jpg" },
-        { title: "Ao Haru Ride", status: "belum", type: "tv", fav: false, img: "https://myanimelist.net/images/anime/8/64813.jpg" },
-        { title: "Hyouka", status: "belum", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/13/50521.jpg" },
-        { title: "Nisekoi", status: "belum", type: "tv", fav: false, img: "https://myanimelist.net/images/anime/13/72626.jpg" },
-        { title: "Go-Toubun no Hanayome", status: "belum", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/1819/97947.jpg" },
-        { title: "ReLIFE", status: "belum", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/3/82149.jpg" },
-        { title: "Golden Time", status: "belum", type: "tv", fav: false, img: "https://myanimelist.net/images/anime/12/52091.jpg" },
-        { title: "Sakurasou no Pet na Kanojo", status: "belum", type: "tv", fav: false, img: "https://myanimelist.net/images/anime/4/43643.jpg" },
-        { title: "Tonari no Kaibutsu-kun", status: "belum", type: "tv", fav: false, img: "https://myanimelist.net/images/anime/4/39779.jpg" },
-        { title: "Kokoro Connect", status: "belum", type: "tv", fav: false, img: "https://myanimelist.net/images/anime/2/39665.jpg" },
-        { title: "Ouran High School Host Club", status: "belum", type: "tv", fav: false, img: "https://myanimelist.net/images/anime/2/71992.jpg" },
-        { title: "Sono Bisque Doll", status: "belum", type: "tv", fav: false, img: "https://myanimelist.net/images/anime/1179/119897.jpg" },
-        { title: "Komi-san wa Komyushou Desu", status: "belum", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/1108/116664.jpg" },
-        { title: "Nagatoro-san", status: "belum", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/1900/114771.jpg" },
-        { title: "Takagi-san", status: "belum", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/11/89397.jpg" },
-        { title: "Romantic Killer", status: "belum", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/1769/128362.jpg" },
-        { title: "Jaku-Chara Tomozaki-kun", status: "belum", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/1271/110547.jpg" },
-        { title: "Masamune-kun no Revenge", status: "belum", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/10/82331.jpg" },
-        { title: "School Rumble", status: "belum", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/14/75471.jpg" },
-        { title: "Yamada-kun to 7-nin no Majo", status: "belum", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/12/73172.jpg" },
-        { title: "Bokutachi wa Benkyou ga Dekinai", status: "belum", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/1188/97946.jpg" },
-        { title: "Kishuku Gakkou no Juliet", status: "belum", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/1045/94314.jpg" },
-        { title: "Koi to Uso", status: "belum", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/13/86575.jpg" },
-        { title: "Sword Art Online", status: "belum", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/11/39717.jpg" },
-        { title: "Akagami no Shirayuki-hime", status: "belum", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/12/74731.jpg" },
-        { title: "Akatsuki no Yona", status: "belum", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/10/67631.jpg" },
-        { title: "Kamisama Hajimemashita", status: "belum", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/4/41323.jpg" },
-        { title: "Spice and Wolf", status: "belum", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/10/11481.jpg" },
-        { title: "Mahoutsukai no Yome", status: "belum", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/9/87742.jpg" },
-        { title: "Re:Zero", status: "belum", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/11/79410.jpg" },
-        { title: "Shin no Nakama", status: "belum", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/1359/117965.jpg" },
-        { title: "Seirei Gensouki", status: "belum", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/1146/115668.jpg" },
-        { title: "Otome Game no Hametsu Flag", status: "belum", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/1138/105748.jpg" },
-        { title: "7th Time Loop", status: "belum", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/1070/140224.jpg" },
-        { title: "Raeliana", status: "belum", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/1039/134444.jpg" },
-        { title: "Sugar Apple Fairy Tale", status: "belum", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/1628/131441.jpg" },
-        { title: "Inuyasha", status: "belum", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/13/11059.jpg" },
-        { title: "Noragami", status: "belum", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/6/56549.jpg" },
-        { title: "Kyoukai no Kanata", status: "belum", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/6/53413.jpg" },
-        { title: "Charlotte", status: "belum", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/12/74683.jpg" },
-        { title: "Wotakoi", status: "belum", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/12/90240.jpg" },
-        { title: "Senpai ga Urusai", status: "belum", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/1841/117621.jpg" },
-        { title: "Koori Zokusei Danshi", status: "belum", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/1004/130103.jpg" },
-        { title: "Net-juu no Susume", status: "belum", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/6/88344.jpg" },
-        { title: "Nana", status: "belum", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/2/11232.jpg" },
-        { title: "Honey and Clover", status: "belum", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/11/24059.jpg" },
-        { title: "Nodame Cantabile", status: "belum", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/3/17841.jpg" },
-        { title: "Yesterday wo Utatte", status: "belum", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/1583/106342.jpg" },
-        { title: "Kuzu no Honkai", status: "belum", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/12/83648.jpg" },
-        { title: "Paradise Kiss", status: "belum", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/3/5431.jpg" },
-        { title: "Plastic Memories", status: "belum", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/2/71662.jpg" },
-        { title: "Anohana", status: "belum", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/5/79623.jpg" },
-        { title: "Angel Beats!", status: "belum", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/10/22061.jpg" },
-        { title: "Violet Evergarden", status: "belum", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/1795/95088.jpg" },
-        { title: "Itazura na Kiss", status: "belum", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/3/21798.jpg" },
-        { title: "Lovely Complex", status: "belum", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/8/16848.jpg" },
-        { title: "Zero no Tsukaima", status: "belum", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/11/48431.jpg" },
-        { title: "Shakugan no Shana", status: "belum", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/13/21430.jpg" },
-        { title: "Kanon", status: "belum", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/6/21307.jpg" },
-        { title: "Air", status: "belum", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/4/21306.jpg" },
-        { title: "Special A", status: "belum", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/12/10705.jpg" },
-        { title: "Bokura ga Ita", status: "belum", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/10/21327.jpg" },
-        { title: "Vampire Knight", status: "belum", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/6/9060.jpg" },
-        { title: "Chobits", status: "belum", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/11/24716.jpg" },
-        { title: "Hi Score Girl", status: "belum", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/1310/93096.jpg" },
-        { title: "Kanojo, Okarishimasu", status: "belum", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/1101/107739.jpg" },
-        { title: "Fuufu Ijou, Koibito Miman", status: "belum", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/1360/127627.jpg" },
-        { title: "Kakkou no Iinazuke", status: "belum", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/1063/122044.jpg" },
-        { title: "Kimi wa Houkago Insomnia", status: "belum", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/1220/136005.jpg" },
-        { title: "Boku no Kokoro no Yabai Yatsu", status: "belum", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/1209/135310.jpg" },
-        { title: "Kawaii dake ja Nai Shikimori-san", status: "belum", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/1792/123087.jpg" },
-        { title: "Ore Monogatari!!", status: "belum", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/12/73" },
-        { title: "My LOve Story with Yamada -kun", status : "belum", type: "tv", fav: false, img: "https://cdn .myanimelist. net /images /anime/1247/136306. jpg" },
-        { title: "Yubisaki to Renren", status: "belum", type: "tv", fav: false, img: "https:1/ cdn.myanimelist. net/images/anime /1917/139396. jpg" }, 
-                // --- MOVIES ---
-        { title: "Kimi No Nawa", status: "completed", type: "movie", fav: true, img: "https://cdn.myanimelist.net/images/anime/5/87048.jpg" },
-        { title: "Tenki No Ko", status: "completed", type: "movie", fav: true, img: "https://cdn.myanimelist.net/images/anime/1880/101146.jpg" },
-        { title: "I Want to Eat Your Pancreas", status: "completed", type: "movie", fav: false, img: "https://cdn.myanimelist.net/images/anime/1768/93291.jpg" },
-        { title: "The Tunnel to Summer", status: "completed", type: "movie", fav: false, img: "https://cdn.myanimelist.net/images/anime/1462/125397.jpg" },
-        { title: "Summer Ghost", status: "completed", type: "movie", fav: false, img: "https://cdn.myanimelist.net/images/anime/1651/117943.jpg" },
-        { title: "Hello World", status: "belum", type: "movie", fav: false, img: "https://cdn.myanimelist.net/images/anime/1147/112650.jpg" },
-        { title: "Koe No Katachi", status: "completed", type: "movie", fav: true, img: "https://cdn.myanimelist.net/images/anime/1122/96435.jpg" },
-        { title: "5 Centimeters Per Second", status: "completed", type: "movie", fav: false, img: "https://cdn.myanimelist.net/images/anime/1410/112994.jpg" },
-        { title: "The Anthem of the Heart", status: "belum", type: "movie", fav: false, img: "https://cdn.myanimelist.net/images/anime/1245/112628.jpg" },
-        { title: "Kimi woi Aishita", status: "belum", type: "movie", fav: false, img: "https://cdn.myanimelist.net/images/anime/1332/127596.jpg" },
-        { title: "Words Bubble Up Like Soda Pop", status: "completed", type: "movie", fav: false, img: "https://cdn.myanimelist.net/images/anime/1952/116031.jpg" },
-        { title: "A Whisker Away", status: "completed", type: "movie", fav: false, img: "https://cdn.myanimelist.net/images/anime/1045/106389.jpg" },
-        { title: "Suzume no Tojimari", status: "completed", type: "movie", fav: false, img: "https://cdn.myanimelist.net/images/anime/1598/128450.jpg" },
-        { title: "Josee, the Tiger and the Fish", status: "completed", type: "movie", fav: false, img: "https://cdn.myanimelist.net/images/anime/1714/108892.jpg" },
-        { title: "No Game No Life: Zero", status: "belum", type: "movie", fav: false, img: "https://cdn.myanimelist.net/images/anime/1204/107056.jpg" },
-        { title: "Hotarubi no Mori e", status: "belum", type: "movie", fav: false, img: "https://cdn.myanimelist.net/images/anime/1831/133036.jpg" },
-        { title: "Kotonoha no Niwa", status: "belum", type: "movie", fav: false, img: "https://cdn.myanimelist.net/images/anime/12/49843.jpg" },
-        { title: "Tamako Love Story", status: "belum", type: "movie", fav: false, img: "https://cdn.myanimelist.net/images/anime/13/61219.jpg" }
+        { title: "Tonikaku Kawaii", status: "completed", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/1613/108722.jpg", video: "https://www.youtube.com/embed/dQw4w9WgXcQ" },
+        { title: "Spy X Family", status: "completed", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/1441/122795.jpg", video: "" },
+        { title: "Horimiya", status: "completed", type: "tv", fav: false, img: "https://myanimelist.net/images/anime/1695/111486.jpg", video: "" },
+        { title: "Tsuki Ga Kirei", status: "belum", type: "tv", fav: false, img: "https://myanimelist.net/images/anime/2/85592.jpg", video: "" },
+        { title: "Chuunibyou Demo Koi Ga Shitai", status: "watching", type: "tv", fav: false, img: "https://myanimelist.net/images/anime/7/56643.jpg", video: "" },
+        { title: "Shiro Seijo To Kuro Bokushi", status: "completed", type: "tv", fav: false, img: "https://myanimelist.net/images/anime/1329/135096.jpg", video: "" },
+        { title: "Giji Harem", status: "completed", type: "tv", fav: true, img: "https://myanimelist.net/images/anime/1607/143547.jpg", video: "" },
+        { title: "Roshidere", status: "completed", type: "tv", fav: false, img: "https://myanimelist.net/images/anime/1596/152806.jpg", video: "" },
+        { title: "The Angel Next Door", status: "completed", type: "tv", fav: true, img: "https://cdn.myanimelist.net/images/anime/1989/154843.jpg", video: "" },
+        { title: "The Girl I Like Forgot Her Glasses", status: "completed", type: "tv", fav: true, img: "https://myanimelist.net/images/anime/1582/136325.jpg", video: "" },
+        { title: "Gimai Seikatsu", status: "completed", type: "tv", fav: true, img: "https://myanimelist.net/images/anime/1420/143707.jpg", video: "" },
+        { title: "Kaoru Hana wa Rin to Saku", status: "completed", type: "tv", fav: true, img: "https://myanimelist.net/images/anime/1744/150433.jpg", video: "" },
+        { title: "Taisho Otome Otogibanashi", status: "completed", type: "tv", fav: false, img: "https://myanimelist.net/images/anime/1662/118849.jpg", video: "" },
+        { title: "Mamahaha no Tsurego", status: "completed", type: "tv", fav: true, img: "https://myanimelist.net/images/anime/1708/123281.jpg", video: "" },
+        { title: "Kubo-san wa Mob wo Yurusanai", status: "completed", type: "tv", fav: true, img: "https://myanimelist.net/images/anime/1818/132330.jpg", video: "" },
+        { title: "Insomniacs After School", status: "completed", type: "tv", fav: true, img: "https://myanimelist.net/images/anime/1402/134007.jpg", video: "" },
+        { title: "Bokiyou na Senpai", status: "watching", type: "tv", fav: false, img: "https://myanimelist.net/images/anime/1257/152233.jpg", video: "" },
+        { title: "Yuru Camp", status: "completed", type: "tv", fav: true, img: "https://myanimelist.net/images/anime/4/89877.jpg", video: "" },
+        { title: "Seihantai na Kimi to Boku", status: "completed", type: "tv", fav: false, img: "https://myanimelist.net/images/anime/1140/154457.jpg", video: "" },
+        { title: "Kimi ni Todoke", status: "watching", type: "tv", fav: false, img: "https://myanimelist.net/images/anime/1502/124384.jpg", video: "" },
+        { title: "Kono Kaisha ni Suki na Hito ga Imasu", status: "watching", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/1123/146384.jpg", video: "" },
+        { title: "My Love Story with Yamada -kun", status: "belum", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/1247/136306.jpg", video: "" },
+        { title: "Yubisaki to Renren", status: "belum", type: "tv", fav: false, img: "https://cdn.myanimelist.net/images/anime/1917/139396.jpg", video: "" },
+        { title: "Kimi No Nawa", status: "completed", type: "movie", fav: true, img: "https://cdn.myanimelist.net/images/anime/5/87048.jpg", video: "" },
+        { title: "Tenki No Ko", status: "completed", type: "movie", fav: true, img: "https://cdn.myanimelist.net/images/anime/1880/101146.jpg", video: "" }
     ];
 
+    let currentVideoUrl = "";
+    let currentFilter = "all";
+
     function renderAnime() {
-        document.getElementById('anime-list').innerHTML = myAnimes.map(anime => `
-            <div class="gallery-item ${anime.status} ${anime.fav ? 'is-fav' : ''} type-${anime.type}">
+        document.getElementById('anime-list').innerHTML = myAnimes.map((anime, index) => `
+            <div class="gallery-item ${anime.status} ${anime.fav ? 'is-fav' : ''} type-${anime.type}" onclick="openPlayer('${anime.title.replace(/'/g, "\\'")}', '${anime.video}')">
                 ${anime.fav ? '<div class="fav-badge">❤️</div>' : ''}
                 <div class="type-badge">${anime.type.toUpperCase()}</div>
                 <img src="${anime.img}" alt="${anime.title}">
@@ -253,18 +233,58 @@
         `).join('');
     }
 
-    function filterGallery(category) {
+    // FILTER TOMBOL
+    function filterGallery(category, btnElement) {
+        currentFilter = category;
         const buttons = document.querySelectorAll('.filter-btn');
         buttons.forEach(btn => btn.classList.remove('active'));
-        if (event) event.target.classList.add('active');
-        
-        document.querySelectorAll('.gallery-item').forEach(item => { 
-            if (category === 'all') {
+        if (btnElement) btnElement.classList.add('active');
+        applyFilterAndSearch();
+    }
+
+    // FITUR PENCARIAN REAL-TIME
+    function searchAnimeFunc() {
+        applyFilterAndSearch();
+    }
+
+    // KOMBINASI FILTER & SEARCH JALAN BARENGAN
+    function applyFilterAndSearch() {
+        const searchValue = document.getElementById('searchAnime').value.toLowerCase();
+        document.querySelectorAll('.gallery-item').forEach(item => {
+            const title = item.querySelector('h3').innerText.toLowerCase();
+            const matchesCategory = (currentFilter === 'all' || item.classList.contains(currentFilter));
+            const matchesSearch = title.includes(searchValue);
+
+            if (matchesCategory && matchesSearch) {
                 item.classList.remove('hide');
             } else {
-                item.classList.contains(category) ? item.classList.remove('hide') : item.classList.add('hide');
+                item.classList.add('hide');
             }
         });
+    }
+
+    /* SISTEM PLAYER & IKLAN POP-UP */
+    function openPlayer(title, videoUrl) {
+        document.getElementById('modalTitle').innerText = title;
+        currentVideoUrl = videoUrl ? videoUrl : "https://www.youtube.com/embed/dQw4w9WgXcQ"; 
+        
+        document.getElementById('adsLayer').style.display = "flex";
+        document.getElementById('videoPlayer').src = ""; 
+
+        document.getElementById('playerModal').classList.add('show');
+    }
+
+    function triggerAd() {
+        // Silakan ganti link iklan/safelink milik FryMedia di sini
+        window.open('https://google.com', '_blank'); 
+        
+        document.getElementById('adsLayer').style.display = "none";
+        document.getElementById('videoPlayer').src = currentVideoUrl;
+    }
+
+    function closePlayer() {
+        document.getElementById('playerModal').classList.remove('show');
+        document.getElementById('videoPlayer').src = ""; 
     }
 
     window.onload = () => { 
@@ -274,5 +294,3 @@
     </script>
 </body>
 </html>
-
-            
