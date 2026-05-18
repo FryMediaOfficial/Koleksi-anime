@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anime Vault | FryMediaOfficial</title>
+    <style>
+        :root {
+            --pink-neon: #ff0055;
+            --pink-glow: rgba(255, 0, 85, 0.4);
+            --bg: #0d0005;
+            --card-bg: #1e000e;
+            --border: rgba(255, 0, 85, 0.2);
+            --text-light: #ffccd9;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-light);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0; padding: 0; text-align: center;
+            overflow-x: hidden; scroll-behavior: smooth;
+        }
+
+        #particles-js { position: fixed; width: 100%; height: 100%; top: 0; left: 0; z-index: -1; }
+
+        header { 
+            padding: 20px 5%; background: rgba(13, 0, 5, 0.85); 
+            border-bottom: 2px solid var(--border); position: relative; z-index: 10;
+            backdrop-filter: blur(10px); display: flex; flex-direction: column; align-items: center;
+        }
+
+        .clock-container { font-size: 1.2rem; color: var(--pink-neon); font-weight: bold; margin-bottom: 5px; }
+        .glowing-title {
+            font-size: 1.8rem; font-weight: bold; letter-spacing: 3px; margin: 0;
+            color: var(--pink-neon); filter: drop-shadow(0 0 8px var(--pink-glow));
+        }
+
+        .main-container {
+            max-width: 900px; margin: 20px auto; padding: 15px; 
+            background: rgba(255, 0, 85, 0.02); border-radius: 20px;
+            border: 1px dashed var(--border); position: relative; z-index: 10;
+        }
+
+        .search-container {
+            margin: 15px auto; max-width: 400px; padding: 0 15px;
+        }
+        .search-bar {
+            width: 100%; padding: 10px 15px; border-radius: 50px;
+            border: 1px solid var(--pink-neon); background: rgba(30, 0, 14, 0.6);
+            color: white; font-size: 0.9rem; outline: none; box-sizing: border-box;
+            transition: 0.3s; text-align: center;
+        }
+        .search-bar:focus { box-shadow: 0 0 10px var(--pink-neon); }
+
+        .filter-buttons { margin: 10px 0 20px 0; display: flex; justify-content: center; gap: 6px; flex-wrap: wrap; padding: 0 10px; }
+        .filter-btn {
+            padding: 8px 12px; background: transparent; border: 1px solid var(--pink-neon);
+            color: var(--pink-neon); border-radius: 50px; font-weight: 600; font-size: 0.7rem; transition: 0.3s;
+            cursor: pointer; text-transform: uppercase;
+        }
+        .filter-btn.active { background: var(--pink-neon); color: white; box-shadow: 0 0 10px var(--pink-neon); }
+
+        .gallery {
+            display: grid; grid-template-columns: repeat(2, 1fr); 
+            gap: 12px; max-width: 1100px; margin: 0 auto 80px; padding: 12px;
+        }
+        
+        @media (min-width: 768px) { .gallery { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); } }
+
+        .gallery-item {
+            background: var(--card-bg); padding: 8px; border-radius: 15px;
+            border: 1px solid var(--border); transition: 0.3s; position: relative;
+            text-align: left; overflow: hidden; cursor: pointer;
+        }
+        .gallery-item:hover { transform: translateY(-5px); box-shadow: 0 5px 15px var(--pink-glow); }
+        .gallery-item img { width: 100%; height: 200px; object-fit: cover; border-radius: 10px; }
+        .gallery-item h3 { font-size: 0.8rem; margin: 8px 0 4px 0; color: white; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 2.2em; line-height: 1.1em; }
+        .gallery-item desert { display: none !important; }
+        .gallery-item.hide { display: none !important; }
+
+        .type-badge {
+            position: absolute; top: 12px; right: 12px; background: rgba(0, 0, 0, 0.7);
+            color: #fff; padding: 2px 6px; border-radius: 5px; font-size: 0.6rem; font-weight: bold;
+            border: 1px solid var(--border); z-index: 2;
+        }
+
+        .genre-labels { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+        .genre-tag { background: rgba(255, 0, 85, 0.15); color: #ff99bb; font-size: 0.55rem; padding: 1px 5px; border-radius: 3px; text-transform: uppercase; border: 1px solid rgba(255, 0, 85, 0.3); }
+        
+        .modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(13, 0, 5, 0.9); z-index: 1000;
+            display: flex; justify-content: center; align-items: center;
+            opacity: 0; pointer-events: none; transition: 0.3s ease;
+        }
+        .modal.show { opacity: 1; pointer-events: auto; }
+        .modal-content {
+            background: #1e000e; width: 90%; max-width: 700px;
+            padding: 20px; border-radius: 20px; border: 2px solid var(--pink-neon);
+            box-shadow: 0 0 25px var(--pink-neon); position: relative;
+            text-align: center;
+        }
+        .close-btn {
+            position: absolute; top: -15px; right: -15px; width: 35px; height: 35px;
+            background: var(--pink-neon); border: none; border-radius: 50%;
+            color: white; font-weight: bold; font-size: 1.1rem; cursor: pointer;
+            box-shadow: 0 0 10px var(--pink-neon);
+        }
+        .video-container {
+            position: relative; width: 100%; padding-bottom: 56.25%;
+            height: 0; border-radius: 10px; overflow: hidden; background: #000;
+            margin-top: 15px;
+        }
+        .video-container iframe {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;
+        }
+
+        .ads-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(20, 0, 10, 0.95); display: flex; flex-direction: column;
+            justify-content: center; align-items: center; z-index: 10; border-radius: 10px;
+        }
+        .ads-btn {
+            padding: 12px 24px; background: var(--pink-neon); border: none;
+            color: white; font-weight: bold; border-radius: 50px; cursor: pointer;
+            box-shadow: 0 0 15px var(--pink-neon); font-size: 0.9rem; text-transform: uppercase;
+        }
+
+        footer { padding: 30px; color: #55001a; font-size: 0.7rem; }
+    </style>
+</head>
+<body>
+
+    <div id="particles-js"></div>
+
+    <header>
+        <div class="clock-container"><span id="clock">00:00:00</span></div>
+        <h1 class="glowing-title">ANIME VAULT</h1>
+    </header>
+
+    <div class="main-container">
+        <p style="color: var(--text-light); margin:0; font-size: 0.85rem; font-style: italic;">Daftar & Streaming Anime Pilihan Sanzs 💖</p>
+    </div>
+
+    <div class="search-container">
+        <input type="text" id="searchAnime" class="search-bar" placeholder="Cari judul anime kamu di sini..." onkeyup="searchAnimeFunc()">
+    </div>
+
+    <div class="filter-buttons">
+        <button class="filter-btn active" onclick="filterGenre('all', this)">SEMUA</button>
+        <button class="filter-btn" onclick="filterGenre('romance', this)">ROMANCE</button>
+        <button class="filter-btn" onclick="filterGenre('comedy', this)">COMEDY</button>
+        <button class="filter-btn" onclick="filterGenre('drama', this)">DRAMA</button>
+        <button class="filter-btn" onclick="filterGenre('fantasy', this)">FANTASY</button>
+        <button class="filter-btn" onclick="filterGenre('slice-of-life', this)">SLICE OF LIFE</button>
+        <button class="filter-btn" onclick="filterGenre('supernatural', this)">SUPERNATURAL</button>
+        <button class="filter-btn" onclick="filterGenre('action', this)">ACTION</button>
+        <button class="filter-btn" onclick="filterGenre('sci-fi', this)">SCI-FI</button>
+    </div>
+    
+    <div class="gallery" id="anime-list"></div>
+
+    <div id="playerModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closePlayer()">X</button>
+            <h2 id="modalTitle" style="margin: 0; font-size: 1.2rem; color: white;">Stream Player</h2>
+            <div class="video-container">
+                <div id="adsLayer" class="ads-overlay">
+                    <p style="font-size: 0.85rem; margin-bottom: 15px;">Sponsori FryMedia dengan mengeklik tombol di bawah ini untuk menonton!</p>
+                    <button class="ads-btn" onclick="triggerAd()">Saksikan & Lewati Iklan 🚀</button>
+                </div>
+                <iframe id="videoPlayer" src="" allowfullscreen></iframe>
+            </div>
+        </div>
+    </div>
+
+    <footer>&copy; 2026 FryMediaOfficial | Sanzs' Vault</footer>
+
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+    particlesJS("particles-js", {"particles": {"number": {"value": 40}, "color": {"value": "#ff0055"}, "size": {"value": 1}, "move": {"enable": true, "speed": 1}}});
+
+    const myAnimes = [
+        {"title": "Tonikaku Kawaii", "type": "tv", "genres": ["romance", "comedy"], "img": "https://cdn.myanimelist.net/images/anime/1613/108722.jpg"},
+        {"title": "Spy X Family", "type": "tv", "genres": ["comedy", "action"], "img": "https://cdn.myanimelist.net/images/anime/1441/122795.jpg"},
+        {"title": "Horimiya", "type": "tv", "genres": ["romance", "slice-of-life"], "img": "https://cdn.myanimelist.net/images/anime/1695/111486.jpg"},
+        {"title": "Tsuki ga Kirei", "type": "tv", "genres": ["romance", "drama"], "img": "https://cdn.myanimelist.net/images/anime/2/85592.jpg"},
+        {"title": "Chuunibyou demo Koi ga Shitai!", "type": "tv", "genres": ["comedy", "romance"], "img": "https://cdn.myanimelist.net/images/anime/7/56643.jpg"},
+        {"title": "Shiro Seijo to Kuro Bokushi", "type": "tv", "genres": ["slice-of-life", "romance"], "img": "https://cdn.myanimelist.net/images/anime/1329/135096.jpg"},
+        {"title": "Giji Harem", "type": "tv", "genres": ["romance", "comedy"], "img": "https://cdn.myanimelist.net/images/anime/1607/143547.jpg"},
+        {"title": "Tokidoki Bosotto Russia-go de Derecharu Tonari no Alya-san", "type": "tv", "genres": ["romance", "comedy"], "img": "https://cdn.myanimelist.net/images/anime/1596/152806.jpg"},
+        {"title": "Otonari no Tenshi-sama ni Itsunomanika Dame Ningen ni\u3055\u308c\u3066\u3044\u305f Ken", "type": "tv", "genres": ["romance", "slice-of-life"], "img": "https://cdn.myanimelist.net/images/anime/1989/154843.jpg"},
+        {"title": "Suki na Ko ga Megane wo Wasureta", "type": "tv", "genres": ["romance", "comedy"], "img": "https://cdn.myanimelist.net/images/anime/1582/136325.jpg"},
+        {"title": "Gimai Seikatsu", "type": "tv", "genres": ["romance", "drama"], "img": "https://cdn.myanimelist.net/images/anime/1420/143707.jpg"},
+        {"title": "Kaoru Hana wa Rin to Saku", "type": "tv", "genres": ["romance", "drama"], "img": "https://cdn.myanimelist.net/images/anime/1744/150433.jpg"},
+        {"title": "Taishou Otome Otogibanashi", "type": "tv", "genres": ["romance", "historical"], "img": "https://cdn.myanimelist.net/images/anime/1662/118849.jpg"},
+        {"title": "Mamahaha no Tsurego ga Motokano datta", "type": "tv", "genres": ["romance", "comedy"], "img": "https://cdn.myanimelist.net/images/anime/1708/123281.jpg"},
+        {"title": "Kubo-san wa Mob wo Yurusanai", "type": "tv", "genres": ["romance", "slice-of-life"], "img": "https://cdn.myanimelist.net/images/anime/1818/132330.jpg"},
+        {"title": "Kimi wa Houkago Insomnia", "type": "tv", "genres": ["romance", "slice-of-life"], "img": "https://cdn.myanimelist.net/images/anime/1402/134007.jpg"},
+        {"title": "Bukiyou na Senpai", "type": "tv", "genres": ["comedy", "romance"], "img": "https://cdn.myanimelist.net/images/anime/1257/152233.jpg"},
+        {"title": "Yuru Camp\u25b3", "type": "tv", "genres": ["slice-of-life", "comedy"], "img": "https://cdn.myanimelist.net/images/anime/4/89877.jpg"},
+        {"title": "Seihantai na Kimi to Boku", "type": "tv", "genres": ["romance", "comedy"], "img": "https://cdn.myanimelist.net/images/anime/1140/154457.jpg"},
+        {"title": "Kimi ni Todoke", "type": "tv", "genres": ["romance", "drama"], "img": "https://cdn.myanimelist.net/images/anime/1502/124384.jpg"},
+        {"title": "Kono Kaisha ni Suki na Hito ga Imasu", "type": "tv", "genres": ["romance", "comedy"], "img": "https://cdn.myanimelist.net/images/anime/1123/146384.jpg"},
+        {"title": "Shigatsu wa Kimi no Uso", "type": "tv", "genres": ["drama", "romance"], "img": "https://cdn.myanimelist.net/images/anime/1405/143284.jpg"},
+        {"title": "Toradora!", "type": "tv", "genres": ["romance", "comedy"], "img": "https://cdn.myanimelist.net/images/anime/13/22128.jpg"},
+        {"title": "Clannad", "type": "tv", "genres": ["drama", "romance"], "img": "https://cdn.myanimelist.net/images/anime/13/75650.jpg"},
+        {"title": "Kaguya-sama wa Kokurasetai", "type": "tv", "genres": ["comedy", "romance"], "img": "https://cdn.myanimelist.net/images/anime/1295/106551.jpg"},
+        {"title": "Fruits Basket", "type": "tv", "genres": ["drama", "romance"], "img": "https://cdn.myanimelist.net/images/anime/1447/99827.jpg"},
+        {"title": "Yahari Ore no Seishun Love Comedy wa Machigatteiru.", "type": "tv", "genres": ["comedy", "drama"], "img": "https://cdn.myanimelist.net/images/anime/1786/120117.jpg"},
+        {"title": "Seishun Buta Yarou wa Bunny Girl Senpai no Yume wo Minai", "type": "tv", "genres": ["drama", "romance"], "img": "https://cdn.myanimelist.net/images/anime/1301/93586.jpg"},
+        {"title": "Kaichou wa Maid-sama!", "type": "tv", "genres": ["romance", "comedy"], "img": "https://cdn.myanimelist.net/images/anime/6/25254.jpg"},
+        {"title": "Sukitte Ii na yo.", "type": "tv", "genres": ["romance", "drama"], "img": "https://myanimelist.net/images/manga/3/198567.jpg"},
+        {"title": "Ao Haru Ride", "type": "tv", "genres": ["romance", "drama"], "img": "https://myanimelist.net/images/anime/8/64813.jpg"},
+        {"title": "Hyouka", "type": "tv", "genres": ["mystery", "slice-of-life"], "img": "https://cdn.myanimelist.net/images/anime/13/50521.jpg"},
+        {"title": "Nisekoi", "type": "tv", "genres": ["comedy", "romance"], "img": "https://myanimelist.net/images/anime/13/72626.jpg"},
+        {"title": "Go-Toubun no Hanayome", "type": "tv", "genres": ["comedy", "romance"], "img": "https://cdn.myanimelist.net/images/anime/1819/97947.jpg"},
+        {"title": "ReLIFE", "type": "tv", "genres": ["slice-of-life", "romance"], "img": "https://cdn.myanimelist.net/images/anime/3/82149.jpg"},
+        {"title": "Golden Time", "type": "tv", "genres": ["romance", "drama"], "img": "https://myanimelist.net/images/anime/12/52091.jpg"},
+        {"title": "Sakurasou no Pet na Kanojo", "type": "tv", "genres": ["comedy", "romance"], "img": "https://myanimelist.net/images/anime/4/43643.jpg"},
+        {"title": "Tonari no Kaibutsu-kun", "type": "tv", "genres": ["comedy", "romance"], "img": "https://myanimelist.net/images/anime/4/39779.jpg"},
+        {"title": "Kokoro Connect", "type": "tv", "genres": ["drama", "supernatural"], "img": "https://myanimelist.net/images/anime/2/39665.jpg"},
+        {"title": "Ouran Koukou Host Club", "type": "tv", "genres": ["comedy", "romance"], "img": "https://myanimelist.net/images/anime/2/71992.jpg"},
+        {"title": "Sono Bisque Doll wa Koi wo Suru", "type": "tv", "genres": ["romance", "slice-of-life"], "img": "https://myanimelist.net/images/anime/1179/119897.jpg"},
+        {"title": "Komi-san wa, Komyushou desu.", "type": "tv", "genres": ["comedy", "slice-of-life"], "img": "https://cdn.myanimelist.net/images/anime/1108/116664.jpg"},
+        {"title": "Ijiranaide, Nagatoro-san", "type": "tv", "genres": ["comedy", "romance"], "img": "https://cdn.myanimelist.net/images/anime/1900/114771.jpg"},
+        {"title": "Karakai Jouzu no Takagi-san", "type": "tv", "genres": ["comedy", "slice-of-life"], "img": "https://cdn.myanimelist.net/images/anime/11/89397.jpg"},
+        {"title": "Romantic Killer", "type": "tv", "genres": ["comedy", "romance"], "img": "https://cdn.myanimelist.net/images/anime/1769/128362.jpg"},
+        {"title": "Jaku-Chara Tomozaki-kun", "type": "tv", "genres": ["drama", "romance"], "img": "https://cdn.myanimelist.net/images/anime/1271/110547.jpg"},
+        {"title": "Masamune-kun no Revenge", "type": "tv", "genres": ["comedy", "romance"], "img": "https://cdn.myanimelist.net/images/anime/10/82331.jpg"},
+        {"title": "School Rumble", "type": "tv", "genres": ["comedy", "romance"], "img": "https://cdn.myanimelist.net/images/anime/14/75471.jpg"},
+        {"title": "Yamada-kun to 7-nin no Majo", "type": "tv", "genres": ["comedy", "supernatural"], "img": "https://cdn.myanimelist.net/images/anime/12/73172.jpg"},
+        {"title": "Bokutachi wa Benkyou ga Dekinai", "type": "tv", "genres": ["comedy", "romance"], "img": "https://cdn.myanimelist.net/images/anime/1188/97946.jpg"},
+        {"title": "Kishuku Gakkou no Juliet", "type": "tv", "genres": ["romance", "action"], "img": "https://cdn.myanimelist.net/images/anime/1045/94314.jpg"},
+        {"title": "Koi to Uso", "type": "tv", "genres": ["drama", "romance"], "img": "https://cdn.myanimelist.net/images/anime/13/86575.jpg"},
+        {"title": "Sword Art Online", "type": "tv", "genres": ["action", "fantasy"], "img": "https://cdn.myanimelist.net/images/anime/11/39717.jpg"},
+        {"title": "Akagami no Shirayuki-hime", "type": "tv", "genres": ["fantasy", "romance"], "img": "https://cdn.myanimelist.net/images/anime/12/74731.jpg"},
+        {"title": "Akatsuki no Yona", "type": "tv", "genres": ["action", "fantasy"], "img": "https://cdn.myanimelist.net/images/anime/10/67631.jpg"},
+        {"title": "Kamisama Hajimemashita", "type": "tv", "genres": ["fantasy", "romance"], "img": "https://cdn.myanimelist.net/images/anime/4/41323.jpg"},
+        {"title": "Ookami to Koushinryou", "type": "tv", "genres": ["adventure", "fantasy"], "img": "https://cdn.myanimelist.net/images/anime/10/11481.jpg"},
+        {"title": "Mahoutsukai no Yome", "type": "tv", "genres": ["fantasy", "drama"], "img": "https://cdn.myanimelist.net/images/anime/9/87742.jpg"},
+        {"title": "Re:Zero kara Hajimeru Isekai Seikatsu", "type": "tv", "genres": ["fantasy", "drama"], "img": "https://cdn.myanimelist.net/images/anime/11/79410.jpg"},
+        {"title": "Shin no Nakama ja Nai to Yuusha no Party wo Owasareta node", "type": "tv", "genres": ["fantasy", "slice-of-life"], "img": "https://cdn.myanimelist.net/images/anime/1359/117965.jpg"},
+        {"title": "Seirei Gensouki", "type": "tv", "genres": ["fantasy", "action"], "img": "https://cdn.myanimelist.net/images/anime/1146/115668.jpg"},
+        {"title": "Otome Game no Hametsu Flag shika Nai Akuyaku Reijou ni Tensei shiteshimatta...", "type": "tv", "genres": ["fantasy", "comedy"], "img": "https://cdn.myanimelist.net/images/anime/1138/105748.jpg"},
+        {"title": "Loop 7-kaime no Akuyaku Reijou wa, Moto Tekikoku de Jiyuu Kimama na Hanayome Seikatsu wo Mankitsu suru", "type": "tv", "genres": ["fantasy", "romance"], "img": "https://cdn.myanimelist.net/images/anime/1070/140224.jpg"},
+        {"title": "Kanojo ga Koushou ni Tatta Riyuu", "type": "tv", "genres": ["fantasy", "romance"], "img": "https://cdn.myanimelist.net/images/anime/1039/134444.jpg"},
+        {"title": "Sugar Apple Fairy Tale", "type": "tv", "genres": ["fantasy", "romance"], "img": "https://cdn.myanimelist.net/images/anime/1628/131441.jpg"},
+        {"title": "Inuyasha", "type": "tv", "genres": ["action", "fantasy"], "img": "https://cdn.myanimelist.net/images/anime/13/11059.jpg"},
+        {"title": "Noragami", "type": "tv", "genres": ["action", "supernatural"], "img": "https://cdn.myanimelist.net/images/anime/6/56549.jpg"},
+        {"title": "Kyoukai no Kanata", "type": "tv", "genres": ["supernatural", "fantasy"], "img": "https://cdn.myanimelist.net/images/anime/6/53413.jpg"},
+        {"title": "Charlotte", "type": "tv", "genres": ["supernatural", "drama"], "img": "https://cdn.myanimelist.net/images/anime/12/74683.jpg"},
+        {"title": "Wotaku ni Koi wa Muzukashii", "type": "tv", "genres": ["romance", "comedy"], "img": "https://cdn.myanimelist.net/images/anime/12/90240.jpg"},
+        {"title": "Senpai ga Uzai Kouhai no Hanashi", "type": "tv", "genres": ["comedy", "slice-of-life"], "img": "https://cdn.myanimelist.net/images/anime/1841/117621.jpg"},
+        {"title": "Koori Zokusei Danshi to Cool na Douryou Joshi", "type": "tv", "genres": ["romance", "fantasy"], "img": "https://cdn.myanimelist.net/images/anime/1004/130103.jpg"},
+        {"title": "Net-juu no Susume", "type": "tv", "genres": ["comedy", "romance"], "img": "https://cdn.myanimelist.net/images/anime/6/88344.jpg"},
+        {"title": "Nana", "type": "tv", "genres": ["drama", "music"], "img": "https://cdn.myanimelist.net/images/anime/2/11232.jpg"},
+        {"title": "Hachimitsu to Clover", "type": "tv", "genres": ["drama", "romance"], "img": "https://cdn.myanimelist.net/images/anime/11/24059.jpg"},
+        {"title": "Nodame Cantabile", "type": "tv", "genres": ["music", "comedy"], "img": "https://cdn.myanimelist.net/images/anime/3/17841.jpg"},
+        {"title": "Yesterday wo Utatte", "type": "tv", "genres": ["drama", "romance"], "img": "https://cdn.myanimelist.net/images/anime/1583/106342.jpg"},
+        {"title": "Kuzu no Honkai", "type": "tv", "genres": ["drama", "romance"], "img": "https://cdn.myanimelist.net/images/anime/12/83648.jpg"},
+        {"title": "Paradise Kiss", "type": "tv", "genres": ["drama", "romance"], "img": "https://cdn.myanimelist.net/images/anime/3/5431.jpg"},
+        {"title": "Plastic Memories", "type": "tv", "genres": ["drama", "romance"], "img": "https://cdn.myanimelist.net/images/anime/2/71662.jpg"},
+        {"title": "Ano Hi Mita Hana no Namae wo Bokutachi wa Mada Shiranai.", "type": "tv", "genres": ["drama", "supernatural"], "img": "https://cdn.myanimelist.net/images/anime/5/79623.jpg"},
+        {"title": "Angel Beats!", "type": "tv", "genres": ["drama", "supernatural"], "img": "https://cdn.myanimelist.net/images/anime/10/22061.jpg"},
+        {"title": "Violet Evergarden", "type": "tv", "genres": ["drama", "fantasy"], "img": "https://cdn.myanimelist.net/images/anime/1795/95088.jpg"},
+        {"title": "Itazura na Kiss", "type": "tv", "genres": ["romance", "comedy"], "img": "https://cdn.myanimelist.net/images/anime/3/21798.jpg"},
+        {"title": "Lovely\u2605Complex", "type": "tv", "genres": ["comedy", "romance"], "img": "https://cdn.myanimelist.net/images/anime/8/16848.jpg"},
+        {"title": "Zero no Tsukaima", "type": "tv", "genres": ["fantasy", "romance"], "img": "https://cdn.myanimelist.net/images/anime/11/48431.jpg"},
+        {"title": "Shakugan no Shana", "type": "tv", "genres": ["action", "fantasy"], "img": "https://cdn.myanimelist.net/images/anime/13/21430.jpg"},
+        {"title": "Kanon (2006)", "type": "tv", "genres": ["drama", "supernatural"], "img": "https://cdn.myanimelist.net/images/anime/6/21307.jpg"},
+        {"title": "Air", "type": "tv", "genres": ["drama", "supernatural"], "img": "https://cdn.myanimelist.net/images/anime/4/21306.jpg"},
+        {"title": "Special A", "type": "tv", "genres": ["comedy", "romance"], "img": "https://cdn.myanimelist.net/images/anime/12/10705.jpg"},
+        {"title": "Bokura ga Ita", "type": "tv", "genres": ["romance", "drama"], "img": "https://cdn.myanimelist.net/images/anime/10/21327.jpg"},
+        {"title": "Vampire Knight", "type": "tv", "genres": ["supernatural", "romance"], "img": "https://cdn.myanimelist.net/images/anime/6/9060.jpg"},
+        {"title": "Chobits", "type": "tv", "genres": ["comedy", "sci-fi"], "img": "https://cdn.myanimelist.net/images/anime/11/24716.jpg"},
+        {"title": "Hi Score Girl", "type": "tv", "genres": ["comedy", "romance"], "img": "https://cdn.myanimelist.net/images/anime/1310/93096.jpg"},
+        {"title": "Kanojo, Okarishimasu", "type": "tv", "genres": ["comedy", "romance"], "img": "https://cdn.myanimelist.net/images/anime/1101/107739.jpg"},
+        {"title": "Fuufu Ijou, Koibito Miman.", "type": "tv", "genres": ["romance", "comedy"], "img": "https://cdn.myanimelist.net/images/anime/1360/127627.jpg"},
+        {"title": "Kakkou no Iinazuke", "type": "tv", "genres": ["comedy", "romance"], "img": "https://cdn.myanimelist.net/images/anime/1063/122044.jpg"},
+        {"title": "Boku no Kokoro no Yabai Yatsu", "type": "tv", "genres": ["romance", "comedy"], "img": "https://cdn.myanimelist.net/images/anime/1209/135310.jpg"},
+        {"title": "Kawaii dake ja Nai Shikimori-san", "type": "tv", "genres": ["romance", "comedy"], "img": "https://cdn.myanimelist.net/images/anime/1792/123087.jpg"},
+        {"title": "Ore Monogatari!!", "type": "tv", "genres": ["romance", "comedy"], "img": "https://cdn.myanimelist.net/images/anime/12/73.jpg"},
+        {"title": "Yamada-kun to Lv999 no Koi wo Suru", "type": "tv", "genres": ["romance", "comedy"], "img": "https://cdn.myanimelist.net/images/anime/1247/136306.jpg"},
+        {"title": "Yubisaki to Renren", "type": "tv", "genres": ["romance", "drama"], "img": "https://cdn.myanimelist.net/images/anime/1917/139396.jpg"},
+        {"title": "Kimi no Na wa.", "type": "movie", "genres": ["romance", "supernatural"], "img": "https://cdn.myanimelist.net/images/anime/5/87048.jpg"},
+        {"title": "Tenki no Ko", "type": "movie", "genres": ["romance", "fantasy"], "img": "https://cdn.myanimelist.net/images/anime/1880/101146.jpg"},
+        {"title": "Kimi no Suizou wo Tabetai", "type": "movie", "genres": ["drama", "romance"], "img": "https://cdn.myanimelist.net/images/anime/1768/93291.jpg"},
+        {"title": "Natsu e no Tunnel, Sayonara no Deguchi", "type": "movie", "genres": ["sci-fi", "romance"], "img": "https://cdn.myanimelist.net/images/anime/1462/125397.jpg"},
+        {"title": "Summer Ghost", "type": "movie", "genres": ["supernatural", "drama"], "img": "https://cdn.myanimelist.net/images/anime/1651/117943.jpg"},
+        {"title": "Hello World", "type": "movie", "genres": ["sci-fi", "romance"], "img": "https://cdn.myanimelist.net/images/anime/1147/112650.jpg"},
+        {"title": "Koe no Katachi", "type": "movie", "genres": ["drama", "slice-of-life"], "img": "https://cdn.myanimelist.net/images/anime/1122/96435.jpg"},
+        {"title": "Byousoku 5 Centimeter", "type": "movie", "genres": ["romance", "drama"], "img": "https://cdn.myanimelist.net/images/anime/1410/112994.jpg"},
+        {"title": "Kokoro ga Sakebitagatterunda.", "type": "movie", "genres": ["drama", "romance"], "img": "https://cdn.myanimelist.net/images/anime/1245/112628.jpg"},
+        {"title": "Kimi wo Aishita Hitori no Boku e", "type": "movie", "genres": ["sci-fi", "romance"], "img": "https://cdn.myanimelist.net/images/anime/1332/127596.jpg"},
+        {"title": "Cider no You ni Kotoba ga Wakiagaru", "type": "movie", "genres": ["romance", "comedy"], "img": "https://cdn.myanimelist.net/images/anime/1952/116031.jpg"},
+        {"title": "Nakitai Watashi wa Cat wo Kaburu", "type": "movie", "genres": ["supernatural", "romance"], "img": "https://cdn.myanimelist.net/images/anime/1045/106389.jpg"},
+        {"title": "Suzume no Tojimari", "type": "movie", "genres": ["fantasy", "adventure"], "img": "https://cdn.myanimelist.net/images/anime/1598/128450.jpg"},
+        {"title": "Josee to Tora to Sakana-tachi", "type": "movie", "genres": ["romance", "drama"], "img": "https://cdn.myanimelist.net/images/anime/1714/108892.jpg"},
+        {"title": "No Game No Life: Zero", "type": "movie", "genres": ["fantasy", "action"], "img": "https://cdn.myanimelist.net/images/anime/1204/107056.jpg"},
+        {"title": "Hotarubi no Mori e", "type": "movie", "genres": ["supernatural", "romance"], "img": "https://cdn.myanimelist.net/images/anime/1831/133036.jpg"},
+        {"title": "Kotonoha no Niwa", "type": "movie", "genres": ["romance", "drama"], "img": "https://cdn.myanimelist.net/images/anime/12/49843.jpg"},
+        {"title": "Tamako Love Story", "type": "movie", "genres": ["romance", "comedy"], "img": "https://cdn.myanimelist.net/images/anime/13/61219.jpg"}
+    ];
+
+    let currentVideoUrl = "";
+    let currentGenreFilter = "all";
+
+    function renderAnime() {
+        document.getElementById('anime-list').innerHTML = myAnimes.map((anime) => {
+            const genresHtml = anime.genres.map(g => `<span class="genre-tag">${g}</span>`).join('');
+            return `
+                <div class="gallery-item type-${anime.type}" data-genres="${anime.genres.join(',')}" onclick="openPlayer('${anime.title.replace(/'/g, "\\'")}', '')">
+                    <div class="type-badge">${anime.type.toUpperCase()}</div>
+                    <img src="${anime.img}" alt="${anime.title}">
+                    <h3>${anime.title}</h3>
+                    <div class="genre-labels">${genresHtml}</div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function filterGenre(genre, btnElement) {
+        currentGenreFilter = genre;
+        const buttons = document.querySelectorAll('.filter-btn');
+        buttons.forEach(btn => btn.classList.remove('active'));
+        if (btnElement) btnElement.classList.add('active');
+        applyFilterAndSearch();
+    }
+
+    function searchAnimeFunc() {
+        applyFilterAndSearch();
+    }
+
+    function applyFilterAndSearch() {
+        const searchValue = document.getElementById('searchAnime').value.toLowerCase();
+        document.querySelectorAll('.gallery-item').forEach(item => {
+            const title = item.querySelector('h3').innerText.toLowerCase();
+            const itemGenres = item.getAttribute('data-genres').split(',');
+            
+            const matchesGenre = (currentGenreFilter === 'all' || itemGenres.includes(currentGenreFilter));
+            const matchesSearch = title.includes(searchValue);
+
+            if (matchesGenre && matchesSearch) {
+                item.classList.remove('hide');
+            } else {
+                item.classList.add('hide');
+            }
+        });
+    }
+
+    function openPlayer(title, videoUrl) {
+        document.getElementById('modalTitle').innerText = title;
+        currentVideoUrl = videoUrl ? videoUrl : "https://www.youtube.com/embed/dQw4w9WgXcQ"; 
+        document.getElementById('adsLayer').style.display = "flex";
+        document.getElementById('videoPlayer').src = ""; 
+        document.getElementById('playerModal').classList.add('show');
+    }
+
+    function triggerAd() {
+        window.open('https://google.com', '_blank'); 
+        document.getElementById('adsLayer').style.display = "none";
+        document.getElementById('videoPlayer').src = currentVideoUrl;
+    }
+
+    function closePlayer() {
+        document.getElementById('playerModal').classList.remove('show');
+        document.getElementById('videoPlayer').src = ""; 
+    }
+
+    window.onload = () => { 
+        renderAnime(); 
+        setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString('id-ID'); }, 1000); 
+    };
+    </script>
+</body>
+</html>
