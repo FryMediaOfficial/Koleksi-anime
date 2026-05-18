@@ -144,6 +144,14 @@
         .ep-btn { min-width: 60px; text-align: center; }
 
         footer { padding: 30px; color: #55001a; font-size: 0.7rem; }
+        
+        .synopsis-text {
+            font-size: 0.85rem;
+            color: #b399a2;
+            margin: 10px 0 15px 0;
+            text-align: justify;
+            line-height: 1.4;
+        }
     </style>
 </head>
 <body>
@@ -186,6 +194,7 @@
                 <div class="anime-info-text">
                     <h2 id="modalTitle" style="margin: 0 0 10px 0; font-size: 1.5rem; color: white;">Judul Anime</h2>
                     <div id="modalGenres" class="genre-labels" style="margin-bottom: 10px;"></div>
+                    <div id="modalSynopsis" class="synopsis-text"></div>
                     <p style="font-size: 0.85rem; color: #ffccd9; margin: 0;">Silakan pilih Season dan Episode di bawah ini untuk memulai streaming.</p>
                 </div>
             </div>
@@ -236,7 +245,7 @@
     function filterGenre(genre, btnElement) {
         currentGenreFilter = genre;
         document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-        if (btnElement) btnElement.add('active');
+        if (btnElement) btnElement.classList.add('active');
         applyFilterAndSearch();
     }
 
@@ -261,6 +270,7 @@
         document.getElementById('modalTitle').innerText = anime.title;
         document.getElementById('modalPoster').src = anime.img;
         document.getElementById('modalGenres').innerHTML = anime.genres.map(g => `<span class="genre-tag">${g}</span>`).join('');
+        document.getElementById('modalSynopsis').innerText = anime.synopsis || "Sinopsis tidak tersedia.";
         
         document.getElementById('videoWrapper').style.display = "none";
         document.getElementById('videoPlayer').src = "";
@@ -327,6 +337,7 @@
     }
 
     function closePlayer() {
+        document.getElementById('playerModal').classList.remove('remove');
         document.getElementById('playerModal').classList.remove('show');
         document.getElementById('videoPlayer').src = ""; 
     }
